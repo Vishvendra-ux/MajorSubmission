@@ -18,6 +18,7 @@ import {
   Bot,
   CheckCircle2,
   Clock,
+  FileSpreadsheet,
   FileText,
   MessageSquare,
   Search,
@@ -34,8 +35,10 @@ import {
   Card,
   EmptyState,
   ErrorState,
+  PageHeader,
   Select,
   Skeleton,
+  StatCard,
   StatusBadge,
 } from '../../components/ui/Primitives';
 import { formatBytes, formatDate } from '../../utils/format';
@@ -99,10 +102,10 @@ export function OverviewDashboardPage() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <Skeleton className="h-12 w-72" />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Skeleton className="h-28 w-full" />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[1, 2, 3, 4].map((n) => (
-            <Skeleton key={n} className="h-28 w-full" />
+            <Skeleton key={n} className="h-32 w-full" />
           ))}
         </div>
         <Skeleton className="h-72 w-full" />
@@ -117,127 +120,139 @@ export function OverviewDashboardPage() {
   const m = data.metrics;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-7">
       {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-              Knowledge Intelligence Overview
-            </h1>
-            <Badge variant="blue">{user?.role.toUpperCase()} SCOPE</Badge>
-          </div>
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+      <PageHeader
+        title="Knowledge Intelligence Overview"
+        badge={<Badge variant="blue">{user?.role.toUpperCase()} SCOPE</Badge>}
+        description={
+          <>
             Real-time metrics derived from authorised documents and grounded RAG interactions in{' '}
             <strong>{user?.organisation_name}</strong>.
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2.5">
-          <div className="w-40">
-            <Select
-              aria-label="Time window filter"
-              value={days}
-              onChange={(e) => setDays(e.target.value)}
-              options={[
-                { value: '7', label: 'Last 7 days' },
-                { value: '30', label: 'Last 30 days' },
-                { value: '90', label: 'Last 90 days' },
-                { value: '365', label: 'Last 12 months' },
-              ]}
-            />
-          </div>
-          <Link to="/app/upload">
-            <Button variant="outline" size="md">
-              <Upload className="h-4 w-4" />
-              Upload File
-            </Button>
-          </Link>
-          <Link to="/app/assistant">
-            <Button variant="primary" size="md">
-              <Bot className="h-4 w-4" />
-              Ask Assistant
-            </Button>
-          </Link>
-        </div>
-      </div>
+          </>
+        }
+        actions={
+          <>
+            <div className="w-40">
+              <Select
+                aria-label="Time window filter"
+                value={days}
+                onChange={(e) => setDays(e.target.value)}
+                options={[
+                  { value: '7', label: 'Last 7 days' },
+                  { value: '30', label: 'Last 30 days' },
+                  { value: '90', label: 'Last 90 days' },
+                  { value: '365', label: 'Last 12 months' },
+                ]}
+              />
+            </div>
+            <Link to="/app/upload">
+              <Button variant="outline" size="md">
+                <Upload className="h-4 w-4" />
+                Upload File
+              </Button>
+            </Link>
+            <Link to="/app/assistant">
+              <Button variant="primary" size="md">
+                <Bot className="h-4 w-4" />
+                Ask Assistant
+              </Button>
+            </Link>
+          </>
+        }
+      />
 
       {/* Primary KPI Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="p-5">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-              Accessible Documents
-            </span>
-            <FileText className="h-4 w-4 text-blue-600" />
-          </div>
-          <p className="mt-3 text-3xl font-extrabold text-slate-900 dark:text-white">
-            {m.total_accessible_documents}
-          </p>
-          <p className="mt-1 text-xs text-slate-500">
-            <span className="font-semibold text-emerald-600">{m.documents_ready} ready</span> •{' '}
-            {m.total_indexed_chunks} indexed chunks
-          </p>
-        </Card>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard
+          label="Accessible Documents"
+          value={m.total_accessible_documents}
+          subtitle={`${m.documents_ready} ready • ${m.total_indexed_chunks} indexed chunks`}
+          icon={<FileText className="h-5 w-5" />}
+        />
 
-        <Card className="p-5">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-              Ingestion Pipeline
-            </span>
-            {m.documents_failed > 0 ? (
-              <AlertTriangle className="h-4 w-4 text-rose-500" />
+        <StatCard
+          label="Ingestion Pipeline"
+          value={m.documents_processing === 0 ? 'Healthy' : `${m.documents_processing} Active`}
+          subtitle={`${m.documents_failed} failed jobs in window`}
+          icon={
+            m.documents_failed > 0 ? (
+              <AlertTriangle className="h-5 w-5 text-rose-500" />
             ) : (
-              <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-            )}
-          </div>
-          <p className="mt-3 text-3xl font-extrabold text-slate-900 dark:text-white">
-            {m.documents_processing}
-          </p>
-          <p className="mt-1 text-xs text-slate-500">
-            Active jobs •{' '}
-            <span className={m.documents_failed > 0 ? 'text-rose-600 font-semibold' : ''}>
-              {m.documents_failed} failed
-            </span>
-          </p>
-        </Card>
+              <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+            )
+          }
+        />
 
-        <Card className="p-5">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-              Grounded Q&A & Summaries
-            </span>
-            <Sparkles className="h-4 w-4 text-indigo-600" />
-          </div>
-          <p className="mt-3 text-3xl font-extrabold text-slate-900 dark:text-white">
-            {m.questions_asked}
-          </p>
-          <p className="mt-1 text-xs text-slate-500">
-            Questions asked • <strong>{m.summaries_generated}</strong> executive summaries
-          </p>
-        </Card>
+        <StatCard
+          label="Grounded Q&A & Summaries"
+          value={m.questions_asked}
+          subtitle={`${m.summaries_generated} executive summaries generated`}
+          icon={<Sparkles className="h-5 w-5" />}
+        />
 
-        <Card className="p-5">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-              Answer Quality Rating
-            </span>
-            <ThumbsUp className="h-4 w-4 text-emerald-600" />
-          </div>
-          <p className="mt-3 text-3xl font-extrabold text-slate-900 dark:text-white">
-            {m.satisfaction_rate_percent}%
-          </p>
-          <p className="mt-1 text-xs text-slate-500">
-            {m.feedback_positive} positive / {m.feedback_negative} negative ({m.feedback_total}{' '}
-            total)
-          </p>
-        </Card>
+        <StatCard
+          label="Answer Quality Rating"
+          value={`${m.satisfaction_rate_percent}%`}
+          subtitle={`${m.feedback_positive} positive / ${m.feedback_negative} negative (${m.feedback_total} total)`}
+          icon={<ThumbsUp className="h-5 w-5" />}
+        />
+      </div>
+
+      {/* Quick Launch Strip */}
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {[
+          {
+            to: '/app/assistant',
+            icon: Bot,
+            title: 'AI Knowledge Assistant',
+            desc: 'Ask natural language questions with inline citations',
+          },
+          {
+            to: '/app/search',
+            icon: Search,
+            title: 'Semantic & Hybrid Search',
+            desc: 'Rank passages across vector embeddings & keywords',
+          },
+          {
+            to: '/app/upload',
+            icon: Upload,
+            title: 'Ingest New Document',
+            desc: 'Upload PDF, DOCX, PPTX, XLSX, or TXT with OCR',
+          },
+          {
+            to: '/app/summaries',
+            icon: FileSpreadsheet,
+            title: 'Executive Summaries',
+            desc: 'Extract key points, dates, metrics & action items',
+          },
+        ].map((item) => {
+          const Icon = item.icon;
+          return (
+            <Link key={item.to} to={item.to} className="group block">
+              <Card className="interactive-card flex items-center gap-3.5 p-4">
+                <div className="icon-tile h-10 w-10 transition-transform duration-200 group-hover:scale-105">
+                  <Icon className="h-4 w-4" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-xs font-bold text-slate-900 group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
+                    {item.title}
+                  </p>
+                  <p className="truncate text-[11px] text-slate-500 dark:text-slate-400">
+                    {item.desc}
+                  </p>
+                </div>
+                <ArrowRight className="h-3.5 w-3.5 shrink-0 text-slate-400 transition-transform group-hover:translate-x-0.5 group-hover:text-blue-600" />
+              </Card>
+            </Link>
+          );
+        })}
       </div>
 
       {/* Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card className="p-6">
-          <div className="flex items-center justify-between mb-4">
+          <div className="mb-4 flex items-center justify-between">
             <div>
               <h2 className="text-sm font-bold text-slate-900 dark:text-white">
                 Authorised Documents by File Type
@@ -246,6 +261,7 @@ export function OverviewDashboardPage() {
                 Distribution across PDF, DOCX, PPTX, XLSX, and TXT formats
               </p>
             </div>
+            <Badge variant="blue">Format Coverage</Badge>
           </div>
           <div className="h-60 w-full">
             {data.charts.documents_by_type.length > 0 ? (
@@ -255,7 +271,7 @@ export function OverviewDashboardPage() {
                   <XAxis dataKey="file_type" tick={{ fontSize: 12 }} />
                   <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />
                   <Tooltip />
-                  <Bar dataKey="count" fill="#2563eb" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="count" fill="#2563eb" radius={[8, 8, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
@@ -267,7 +283,7 @@ export function OverviewDashboardPage() {
         </Card>
 
         <Card className="p-6">
-          <div className="flex items-center justify-between mb-4">
+          <div className="mb-4 flex items-center justify-between">
             <div>
               <h2 className="text-sm font-bold text-slate-900 dark:text-white">
                 Access Visibility Distribution
@@ -276,6 +292,7 @@ export function OverviewDashboardPage() {
                 Breakdown by Organisation, Workspace, and Restricted scope
               </p>
             </div>
+            <Badge variant="emerald">RBAC Boundaries</Badge>
           </div>
           <div className="h-60 w-full">
             {data.charts.documents_by_visibility.length > 0 ? (
@@ -307,8 +324,8 @@ export function OverviewDashboardPage() {
       </div>
 
       {/* Recent Activity Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-2 p-6 space-y-4">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <Card className="space-y-4 p-6 lg:col-span-2">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-base font-bold text-slate-900 dark:text-white">
@@ -340,17 +357,17 @@ export function OverviewDashboardPage() {
               }
             />
           ) : (
-            <div className="divide-y divide-slate-200 dark:divide-slate-800">
+            <div className="divide-y divide-slate-200/80 dark:divide-slate-800">
               {data.recent_documents.map((doc) => (
                 <div
                   key={doc.id}
-                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-3.5"
+                  className="flex flex-col justify-between gap-3 py-3.5 transition-colors hover:bg-slate-50/50 dark:hover:bg-slate-800/30 sm:flex-row sm:items-center sm:px-2 sm:rounded-xl"
                 >
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
                       <Link
                         to={`/app/documents/${doc.id}`}
-                        className="truncate text-sm font-semibold text-slate-900 dark:text-white hover:text-blue-600"
+                        className="truncate text-sm font-semibold text-slate-900 hover:text-blue-600 dark:text-white"
                       >
                         {doc.title}
                       </Link>
@@ -362,7 +379,7 @@ export function OverviewDashboardPage() {
                       {formatDate(doc.created_at)}
                     </p>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex shrink-0 items-center gap-2">
                     <StatusBadge status={doc.status} />
                     <Link to={`/app/documents/${doc.id}/summary`}>
                       <Button variant="outline" size="sm">
@@ -376,7 +393,7 @@ export function OverviewDashboardPage() {
           )}
         </Card>
 
-        <Card className="p-6 space-y-4">
+        <Card className="space-y-4 p-6">
           <div className="flex items-center justify-between">
             <h2 className="text-base font-bold text-slate-900 dark:text-white">
               Recent Conversations
@@ -399,10 +416,10 @@ export function OverviewDashboardPage() {
                 <Link
                   key={conv.id}
                   to={`/app/assistant?conversation=${conv.id}`}
-                  className="block rounded-xl border border-slate-200 dark:border-slate-800 p-3 hover:border-blue-500 transition-colors"
+                  className="interactive-card block rounded-xl border border-slate-200 p-3 dark:border-slate-800"
                 >
                   <div className="flex items-center gap-2">
-                    <MessageSquare className="h-4 w-4 text-blue-600 shrink-0" />
+                    <MessageSquare className="h-4 w-4 shrink-0 text-blue-600" />
                     <span className="truncate text-xs font-semibold text-slate-900 dark:text-white">
                       {conv.title}
                     </span>
@@ -423,7 +440,7 @@ export function OverviewDashboardPage() {
             </div>
           )}
 
-          <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
+          <div className="border-t border-slate-200 pt-2 dark:border-slate-800">
             <Link to="/app/search" className="block">
               <Button variant="outline" size="sm" className="w-full">
                 <Search className="h-3.5 w-3.5" />
@@ -436,4 +453,3 @@ export function OverviewDashboardPage() {
     </div>
   );
 }
-

@@ -12,18 +12,21 @@ export function BrandLogo({
   return (
     <Link
       to={to}
-      className="inline-flex items-center gap-2.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 rounded-lg"
+      className="group inline-flex items-center gap-3 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
     >
-      <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-slate-900 via-blue-900 to-blue-600 text-white shadow-sm">
+      <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-600 text-white shadow-md shadow-blue-600/25 ring-1 ring-white/20 transition-transform duration-200 group-hover:scale-105">
         <ShieldCheck className="h-5 w-5" />
-        <Sparkles className="h-2.5 w-2.5 text-blue-300 absolute top-1 right-1" />
+        <Sparkles className="absolute right-1 top-1 h-2.5 w-2.5 text-blue-200" />
       </div>
       {!collapsed && (
         <div className="flex flex-col">
-          <span className="text-base font-bold tracking-tight text-slate-900 dark:text-white leading-none">
-            SUMIND<span className="text-blue-600 dark:text-blue-400">-IQ</span>
+          <span className="text-base font-extrabold leading-none tracking-tight text-slate-950 dark:text-white">
+            SUMIND
+            <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent dark:from-blue-400 dark:to-indigo-400">
+              -IQ
+            </span>
           </span>
-          <span className="text-[10px] font-medium uppercase tracking-widest text-slate-500 dark:text-slate-400 mt-0.5">
+          <span className="mt-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
             Grounded Enterprise AI
           </span>
         </div>
@@ -31,4 +34,3 @@ export function BrandLogo({
     </Link>
   );
 }
-

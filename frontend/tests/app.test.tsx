@@ -22,7 +22,12 @@ function renderWithProviders(ui: React.ReactElement, initialEntries = ['/']) {
       <ThemeProvider>
         <ToastProvider>
           <AuthProvider>
-            <MemoryRouter initialEntries={initialEntries}>{ui}</MemoryRouter>
+            <MemoryRouter
+              future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+              initialEntries={initialEntries}
+            >
+              {ui}
+            </MemoryRouter>
           </AuthProvider>
         </ToastProvider>
       </ThemeProvider>
@@ -34,12 +39,12 @@ describe('SUMIND-IQ Frontend Suite', () => {
   it('renders LandingPage with problem, solution, and call-to-action links', () => {
     renderWithProviders(<LandingPage />);
     expect(
-      screen.getByText(/Turn Scattered Internal Documents into/i)
+      screen.getByText(/Your organization’s knowledge/i)
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/Permission-First Retrieval & Source-Verified Synthesis/i)
+      screen.getByText(/Built for trustworthy answers/i)
     ).toBeInTheDocument();
-    expect(screen.getByText(/Launch Knowledge Console/i)).toBeInTheDocument();
+    expect(screen.getByText(/Open your knowledge workspace/i)).toBeInTheDocument();
   });
 
   it('validates LoginPage fields and displays quick demo role switcher buttons', async () => {

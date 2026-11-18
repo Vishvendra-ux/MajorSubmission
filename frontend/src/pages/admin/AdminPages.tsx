@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
-  Bar,
-  BarChart,
   CartesianGrid,
   Cell,
   Legend,
@@ -18,16 +16,12 @@ import {
 } from 'recharts';
 import {
   Activity,
-  AlertTriangle,
   BarChart3,
-  Briefcase,
   CheckCircle2,
   Cpu,
   Database,
   FileText,
-  FolderKanban,
   KeyRound,
-  Lock,
   Plus,
   RefreshCw,
   ScrollText,
@@ -40,17 +34,16 @@ import {
 } from 'lucide-react';
 import { apiRequest } from '../../services/apiClient';
 import {
-  AuditLogItem,
-  DocumentItem,
-  PaginationMeta,
-  ProcessingJobItem,
-  UserRole,
+  type AuditLogItem,
+  type DocumentItem,
+  type PaginationMeta,
+  type ProcessingJobItem,
+  type UserRole,
 } from '../../types/api';
 import {
   Badge,
   Button,
   Card,
-  EmptyState,
   Input,
   Modal,
   Select,
@@ -128,15 +121,15 @@ export function AdminOverviewPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+      <div className="page-hero-banner flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-2xl font-bold tracking-tight text-slate-950 dark:text-white sm:text-3xl">
               Enterprise Administration Overview
             </h1>
             <Badge variant="brand">Admin Governance</Badge>
           </div>
-          <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+          <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">
             Organisation tenant: <strong>{data?.organisation.name}</strong> ({data?.organisation.slug})
           </p>
         </div>
@@ -371,11 +364,14 @@ export function UserManagementPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-          User Identity & Role Management
-        </h1>
-        <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+      <div className="page-hero-banner">
+        <div className="flex items-center gap-2.5">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-950 dark:text-white sm:text-3xl">
+            User Identity & Role Management
+          </h1>
+          <Badge variant="brand">Directory & RBAC</Badge>
+        </div>
+        <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">
           Manage user accounts, role assignments, and active session eligibility across your organisation.
         </p>
       </div>
@@ -517,11 +513,14 @@ export function RolePermissionPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-          Role-Based Access Control (RBAC) Matrix
-        </h1>
-        <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+      <div className="page-hero-banner">
+        <div className="flex items-center gap-2.5">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-950 dark:text-white sm:text-3xl">
+            Role-Based Access Control (RBAC) Matrix
+          </h1>
+          <Badge variant="emerald">Zero-Trust Policies</Badge>
+        </div>
+        <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">
           Authoritative permission definitions enforced on every FastAPI backend endpoint and database query.
         </p>
       </div>
@@ -652,11 +651,14 @@ export function OrgWorkspacePage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-          Organisation & Workspace Boundaries
-        </h1>
-        <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+      <div className="page-hero-banner">
+        <div className="flex items-center gap-2.5">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-950 dark:text-white sm:text-3xl">
+            Organisation & Workspace Boundaries
+          </h1>
+          <Badge variant="brand">Multi-Tenant Scope</Badge>
+        </div>
+        <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">
           Configure departmental workspaces within{' '}
           <strong>{data?.organisation.name || 'your organisation'}</strong> to isolate sensitive documents.
         </p>
@@ -799,12 +801,15 @@ export function AdminDocumentManagementPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+      <div className="page-hero-banner flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-            Organisation Document Governance
-          </h1>
-          <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-2xl font-bold tracking-tight text-slate-950 dark:text-white sm:text-3xl">
+              Organisation Document Governance
+            </h1>
+            <Badge variant="brand">ACL Enforcement</Badge>
+          </div>
+          <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">
             Audit ownership, attach explicit allow/deny ACL policies, or purge sensitive documents.
           </p>
         </div>
@@ -992,11 +997,14 @@ export function AuditLogsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-          Security & Access Audit Logs
-        </h1>
-        <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+      <div className="page-hero-banner">
+        <div className="flex items-center gap-2.5">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-950 dark:text-white sm:text-3xl">
+            Security & Access Audit Logs
+          </h1>
+          <Badge variant="emerald">Immutable Ledger</Badge>
+        </div>
+        <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">
           Tamper-evident record of authentication events, permission denials, document uploads, and administrative actions.
         </p>
       </div>
@@ -1167,12 +1175,15 @@ export function UsageAnalyticsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+      <div className="page-hero-banner flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-            Organisation Usage & Grounding Analytics
-          </h1>
-          <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-2xl font-bold tracking-tight text-slate-950 dark:text-white sm:text-3xl">
+              Organisation Usage & Grounding Analytics
+            </h1>
+            <Badge variant="brand">Live Telemetry</Badge>
+          </div>
+          <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">
             Real-time telemetry calculated directly from PostgreSQL records.
           </p>
         </div>
@@ -1321,12 +1332,15 @@ export function JobMonitoringPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+      <div className="page-hero-banner flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-            Ingestion Pipeline & Job Monitoring
-          </h1>
-          <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-2xl font-bold tracking-tight text-slate-950 dark:text-white sm:text-3xl">
+              Ingestion Pipeline & Job Monitoring
+            </h1>
+            <Badge variant="brand">Async Queue</Badge>
+          </div>
+          <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">
             Inspect background document parsing, OCR, chunking, and vector indexing jobs. Safe retries prevent duplicate chunks.
           </p>
         </div>
@@ -1521,11 +1535,14 @@ export function SystemConfigPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-          System Configuration & AI Provider Telemetry
-        </h1>
-        <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+      <div className="page-hero-banner">
+        <div className="flex items-center gap-2.5">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-950 dark:text-white sm:text-3xl">
+            System Configuration & AI Provider Telemetry
+          </h1>
+          <Badge variant="brand">Runtime Governance</Badge>
+        </div>
+        <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">
           Tune safe, non-secret runtime parameters for document chunking, OCR, and RAG evidence thresholds. Secrets remain strictly server-side.
         </p>
       </div>

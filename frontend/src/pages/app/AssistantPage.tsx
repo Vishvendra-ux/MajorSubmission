@@ -153,7 +153,7 @@ export function AssistantPage() {
     if (!promptText) setQuestion('');
 
     try {
-      let targetConv = activeConv;
+      const targetConv = activeConv;
       if (!targetConv) {
         const created = await apiRequest<ConversationItem>('/chat/conversations', {
           method: 'POST',
@@ -367,27 +367,31 @@ export function AssistantPage() {
       {/* Main RAG Chat Panel */}
       <Card className="lg:col-span-9 flex flex-col max-h-[82vh] overflow-hidden">
         {/* Assistant Top Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/60 px-5 py-3.5">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              <Bot className="h-5 w-5 text-blue-600 shrink-0" />
-              <h1 className="truncate text-sm font-bold text-slate-900 dark:text-white">
-                {activeConv?.title || 'SUMIND-IQ Grounded Knowledge Assistant'}
-              </h1>
-              <Badge variant="emerald">
-                <ShieldCheck className="h-3 w-3" />
-                RAG Grounded
-              </Badge>
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-blue-100/80 dark:border-slate-800 bg-gradient-to-r from-white via-blue-50/40 to-indigo-50/40 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/20 px-5 py-4">
+          <div className="min-w-0 flex items-center gap-3">
+            <div className="icon-tile h-10 w-10">
+              <Bot className="h-5 w-5" />
             </div>
-            <p className="mt-0.5 text-[11px] text-slate-500">
-              Scope:{' '}
-              <strong>
-                {selectedDocIds.length === 0
-                  ? `All Authorised Ready Documents (${availableDocs.length})`
-                  : `${selectedDocIds.length} Selected Document(s)`}
-              </strong>{' '}
-              • Mode: <strong className="uppercase">{searchMode}</strong>
-            </p>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <h1 className="truncate text-sm font-bold text-slate-950 dark:text-white sm:text-base">
+                  {activeConv?.title || 'SUMIND-IQ Grounded Knowledge Assistant'}
+                </h1>
+                <Badge variant="emerald">
+                  <ShieldCheck className="h-3 w-3" />
+                  RAG Grounded
+                </Badge>
+              </div>
+              <p className="mt-0.5 text-[11px] text-slate-500">
+                Scope:{' '}
+                <strong>
+                  {selectedDocIds.length === 0
+                    ? `All Authorised Ready Documents (${availableDocs.length})`
+                    : `${selectedDocIds.length} Selected Document(s)`}
+                </strong>{' '}
+                • Mode: <strong className="uppercase">{searchMode}</strong>
+              </p>
+            </div>
           </div>
 
           <div className="flex items-center gap-2">
@@ -397,7 +401,7 @@ export function AssistantPage() {
               onChange={(e) =>
                 setSearchMode(e.target.value as 'hybrid' | 'semantic' | 'keyword')
               }
-              className="h-8 text-xs py-1 w-32"
+              className="h-9 text-xs py-1 w-36"
               options={[
                 { value: 'hybrid', label: 'Hybrid Search' },
                 { value: 'semantic', label: 'Vector Semantic' },
@@ -443,17 +447,17 @@ export function AssistantPage() {
                 title="Ask a Question Grounded in Your Authorised Documents"
                 description="SUMIND-IQ retrieves relevant chunks from documents you have permission to view, validates source locations, and refuses to guess when evidence is missing."
               />
-              <div className="max-w-2xl mx-auto space-y-2">
+              <div className="max-w-2xl mx-auto space-y-2.5">
                 <p className="text-xs font-bold uppercase tracking-wider text-slate-400 text-center">
                   Suggested Grounded Questions
                 </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {SUGGESTED_PROMPTS.map((prompt, idx) => (
                     <button
                       key={idx}
                       type="button"
                       onClick={() => askQuestion(prompt)}
-                      className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/60 p-3 text-left text-xs text-slate-700 dark:text-slate-200 hover:border-blue-500 transition-colors"
+                      className="interactive-card rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900/70 p-3.5 text-left text-xs font-medium text-slate-700 dark:text-slate-200"
                     >
                       "{prompt}"
                     </button>
@@ -475,7 +479,7 @@ export function AssistantPage() {
                   className={`flex gap-3.5 ${isUser ? 'justify-end' : 'justify-start'}`}
                 >
                   {!isUser && (
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white mt-1">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-sm shadow-blue-600/20 mt-1">
                       <Bot className="h-4 w-4" />
                     </div>
                   )}
@@ -483,8 +487,8 @@ export function AssistantPage() {
                   <div
                     className={`max-w-3xl w-full rounded-2xl p-4 sm:p-5 ${
                       isUser
-                        ? 'max-w-xl bg-slate-900 text-white dark:bg-blue-600'
-                        : 'border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs'
+                        ? 'max-w-xl rounded-br-md bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-600/15'
+                        : 'border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm'
                     }`}
                   >
                     {isUser ? (

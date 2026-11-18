@@ -78,7 +78,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             <div
               key={item.id}
               role="status"
-              className={`pointer-events-auto flex items-start gap-3 rounded-xl border p-4 shadow-lg transition-all ${styles}`}
+              className={`animate-toast-in pointer-events-auto flex items-start gap-3 rounded-xl border p-4 shadow-lg transition-all ${styles}`}
             >
               <Icon className={`h-5 w-5 shrink-0 mt-0.5 ${iconColor}`} />
               <div className="flex-1 min-w-0">

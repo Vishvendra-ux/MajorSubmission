@@ -12,8 +12,46 @@
   }
 
   body {
-    @apply bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100;
+    @apply bg-[#f6f8fc] text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    min-width: 320px;
+  }
+
+  /* Balanced heading wrapping avoids awkward single-word last lines. */
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  :focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+  }
+
+  /* Slim, theme-aware scrollbars (Firefox + WebKit). */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(148 163 184 / 0.5) transparent;
+  }
+
+  .dark * {
+    scrollbar-color: rgb(71 85 105 / 0.6) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-slate-300 dark:bg-slate-700;
+    border: 2px solid transparent;
+    background-clip: padding-box;
   }
 }
 
@@ -22,3 +60,112 @@ mark {
   @apply bg-blue-100 text-blue-900 dark:bg-blue-900/60 dark:text-blue-100 px-1 py-0.5 rounded font-medium;
 }
 
+@layer components {
+  .landing-hero {
+    background:
+      radial-gradient(ellipse at 78% 18%, rgb(191 219 254 / 0.58), transparent 30rem),
+      radial-gradient(ellipse at 9% 84%, rgb(224 231 255 / 0.48), transparent 26rem),
+      linear-gradient(180deg, #f7faff 0%, #fff 70%);
+  }
+
+  .dark .landing-hero {
+    background:
+      radial-gradient(ellipse at 78% 18%, rgb(30 64 175 / 0.22), transparent 30rem),
+      radial-gradient(ellipse at 9% 84%, rgb(49 46 129 / 0.18), transparent 26rem),
+      linear-gradient(180deg, #0b1223 0%, #020617 76%);
+  }
+
+  .landing-grid {
+    background-image: linear-gradient(rgb(148 163 184 / 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(148 163 184 / 0.08) 1px, transparent 1px);
+    background-size: 34px 34px;
+    mask-image: linear-gradient(to bottom, black, transparent 82%);
+  }
+
+  .dark .landing-grid {
+    background-image: linear-gradient(rgb(148 163 184 / 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(148 163 184 / 0.06) 1px, transparent 1px);
+  }
+
+  .preview-shadow {
+    box-shadow: 0 28px 80px -34px rgb(30 64 175 / 0.38), 0 16px 38px -24px rgb(15 23 42 / 0.26);
+  }
+
+  .dark .preview-shadow {
+    box-shadow: 0 28px 80px -34px rgb(37 99 235 / 0.24), 0 16px 38px -24px rgb(0 0 0 / 0.58);
+  }
+
+  .page-hero-banner {
+    @apply relative overflow-hidden rounded-2xl border border-blue-100/80 bg-gradient-to-br from-white via-white to-blue-50/75 p-5 shadow-[0_10px_32px_-24px_rgba(37,99,235,0.28)] dark:border-slate-800 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/25 sm:p-6;
+  }
+
+  .glass-panel {
+    @apply rounded-2xl border border-white/80 bg-white/95 ring-1 ring-slate-900/[0.04] backdrop-blur-xl dark:border-slate-700/80 dark:bg-slate-900/95 dark:ring-white/[0.06];
+  }
+
+  .interactive-card {
+    @apply transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-200/90 hover:shadow-lg hover:shadow-blue-950/[0.05] dark:hover:border-blue-800/80;
+  }
+
+  .icon-tile {
+    @apply flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-100/90 text-blue-700 ring-1 ring-blue-100 dark:from-blue-950/70 dark:to-indigo-950/70 dark:text-blue-300 dark:ring-blue-900/70;
+  }
+}
+
+@layer utilities {
+  /* Entrance animations for overlays, dialogs and toasts. */
+  @keyframes overlay-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes dialog-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes toast-in {
+    from {
+      opacity: 0;
+      transform: translateX(14px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .animate-overlay-in {
+    animation: overlay-in 150ms ease-out;
+  }
+
+  .animate-dialog-in {
+    animation: dialog-in 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .animate-toast-in {
+    animation: toast-in 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}
+
+/* Accessibility: collapse all motion for users who opt out. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

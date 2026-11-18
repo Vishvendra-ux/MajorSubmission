@@ -35,7 +35,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     const variants = {
       primary:
-        'bg-blue-600 text-white hover:bg-blue-700 focus-visible:ring-blue-600 shadow-sm',
+        'bg-gradient-to-br from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 focus-visible:ring-blue-600 shadow-md shadow-blue-600/20',
       secondary:
         'bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200 focus-visible:ring-slate-700',
       outline:
@@ -47,9 +47,9 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     }[variant];
 
     const sizes = {
-      sm: 'h-8 px-3 text-xs rounded-lg gap-1.5',
-      md: 'h-10 px-4 text-sm rounded-lg gap-2',
-      lg: 'h-11 px-5 text-sm rounded-xl gap-2.5',
+      sm: 'h-9 px-3.5 text-xs rounded-xl gap-1.5',
+      md: 'h-11 px-4 text-sm rounded-xl gap-2',
+      lg: 'h-12 px-6 text-sm rounded-xl gap-2.5',
     }[size];
 
     return (
@@ -58,7 +58,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         type={type}
         disabled={disabled || isLoading}
         className={cn(
-          'inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-55 disabled:pointer-events-none',
+          'inline-flex items-center justify-center font-semibold transition-all duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-55 disabled:pointer-events-none',
           variants,
           sizes,
           className
@@ -88,7 +88,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300"
+            className="block text-sm font-semibold text-slate-700 dark:text-slate-300"
           >
             {label}
           </label>
@@ -97,7 +97,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           id={inputId}
           className={cn(
-            'flex h-10 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3.5 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600/20 disabled:cursor-not-allowed disabled:opacity-50',
+            'flex h-11 w-full rounded-xl border border-slate-200 bg-white/90 dark:border-slate-700 dark:bg-slate-900 px-3.5 py-2 text-sm text-slate-900 shadow-sm placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10 disabled:cursor-not-allowed disabled:opacity-50',
             error && 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/20',
             className
           )}
@@ -128,7 +128,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
         {label && (
           <label
             htmlFor={selectId}
-            className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300"
+            className="block text-sm font-semibold text-slate-700 dark:text-slate-300"
           >
             {label}
           </label>
@@ -137,7 +137,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           ref={ref}
           id={selectId}
           className={cn(
-            'flex h-10 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600/20',
+            'flex h-11 w-full rounded-xl border border-slate-200 bg-white/90 dark:border-slate-700 dark:bg-slate-900 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10',
             error && 'border-rose-500',
             className
           )}
@@ -207,7 +207,7 @@ export function Badge({
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-xs font-medium',
+        'inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-semibold tracking-wide',
         styles[variant],
         className
       )}
@@ -258,7 +258,7 @@ export function Card({
   return (
     <div
       className={cn(
-        'rounded-xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm',
+        'rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-[0_8px_28px_-22px_rgba(15,23,42,0.38)]',
         className
       )}
     >
@@ -362,6 +362,10 @@ export function ErrorState({
 }
 
 // --- Dialog ---
+// Module-level counter so nested dialogs (e.g. ConfirmDialog inside Dialog)
+// only restore body scrolling when the last one closes.
+let openDialogCount = 0;
+
 export function Dialog({
   open,
   onClose,
@@ -386,6 +390,16 @@ export function Dialog({
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [open, onClose]);
 
+  useEffect(() => {
+    if (!open) return;
+    openDialogCount += 1;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      openDialogCount -= 1;
+      if (openDialogCount === 0) document.body.style.overflow = '';
+    };
+  }, [open]);
+
   if (!open) return null;
 
   return (
@@ -393,11 +407,11 @@ export function Dialog({
       role="dialog"
       aria-modal="true"
       aria-labelledby="dialog-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs"
+      className="animate-overlay-in fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs"
     >
       <div
         className={cn(
-          'w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-xl max-h-[90vh] overflow-y-auto',
+          'animate-dialog-in w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-xl max-h-[90vh] overflow-y-auto',
           maxWidth
         )}
       >
@@ -525,23 +539,57 @@ export function StatCard({
   icon?: React.ReactNode;
 }) {
   return (
-    <Card className="p-5">
-      <div className="flex items-start justify-between gap-3">
+    <Card className="interactive-card relative overflow-hidden p-5">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -right-6 -top-6 h-20 w-20 rounded-full bg-gradient-to-br from-blue-500/10 to-indigo-500/5 blur-xl"
+      />
+      <div className="relative flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
             {label}
           </p>
-          <p className="mt-1.5 text-2xl font-bold text-slate-900 dark:text-white">{value}</p>
+          <p className="mt-2 text-2xl font-extrabold tabular-nums tracking-tight text-slate-950 dark:text-white sm:text-3xl">
+            {value}
+          </p>
           {subtitle && (
-            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{subtitle}</p>
+            <p className="mt-1.5 text-xs text-slate-500 dark:text-slate-400">{subtitle}</p>
           )}
         </div>
-        {icon && (
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400">
-            {icon}
-          </div>
-        )}
+        {icon && <div className="icon-tile">{icon}</div>}
       </div>
     </Card>
+  );
+}
+
+// --- PageHeader ---
+export function PageHeader({
+  title,
+  description,
+  badge,
+  actions,
+}: {
+  title: React.ReactNode;
+  description?: React.ReactNode;
+  badge?: React.ReactNode;
+  actions?: React.ReactNode;
+}) {
+  return (
+    <div className="page-hero-banner flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
+      <div>
+        <div className="flex flex-wrap items-center gap-2.5">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-950 dark:text-white sm:text-3xl">
+            {title}
+          </h1>
+          {badge}
+        </div>
+        {description && (
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-400">
+            {description}
+          </p>
+        )}
+      </div>
+      {actions && <div className="flex flex-wrap items-center gap-2.5">{actions}</div>}
+    </div>
   );
 }

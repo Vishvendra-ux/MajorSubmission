@@ -6,12 +6,10 @@ import {
   Download,
   Edit3,
   Eye,
-  FileSpreadsheet,
   FileText,
   KeyRound,
   Plus,
   RefreshCw,
-  Search,
   Shield,
   Sparkles,
   Trash2,
@@ -46,7 +44,7 @@ import {
 } from '../../components/ui/Primitives';
 import { CitationCard, SourcePreviewModal } from '../../components/shared/CitationCard';
 import { SafeMarkdown } from '../../components/shared/SafeMarkdown';
-import { formatBytes, formatDate, formatDateTime } from '../../utils/format';
+import { formatBytes, formatDate } from '../../utils/format';
 
 // ============================================================================
 // 1. DOCUMENT LIBRARY PAGE
@@ -204,10 +202,15 @@ export function DocumentLibraryPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="page-hero-banner flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Document Library</h1>
-          <p className="text-xs text-slate-500">
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-2xl font-bold tracking-tight text-slate-950 dark:text-white sm:text-3xl">
+              Document Library
+            </h1>
+            <Badge variant="blue">{pagination.total} Files</Badge>
+          </div>
+          <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">
             Browse, filter, preview, reprocess, and manage permissions for authorised knowledge
             files.
           </p>
@@ -614,11 +617,14 @@ export function UploadDocumentsPage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-          Upload & Ingest Internal Document
-        </h1>
-        <p className="text-xs text-slate-500">
+      <div className="page-hero-banner">
+        <div className="flex items-center gap-2.5">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-950 dark:text-white sm:text-3xl">
+            Upload & Ingest Internal Document
+          </h1>
+          <Badge variant="blue">17-Stage Pipeline</Badge>
+        </div>
+        <p className="mt-1.5 text-sm leading-6 text-slate-600 dark:text-slate-400">
           Supported formats: PDF, DOCX, PPTX, XLSX, TXT. Files are validated by magic-byte
           signature, stored outside public directories, chunked with location metadata, and embedded
           for semantic retrieval.
@@ -1212,12 +1218,15 @@ export function DocumentSummaryPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="page-hero-banner flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-            AI-Generated Document Summary
-          </h1>
-          <p className="text-xs text-slate-500">
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-2xl font-bold tracking-tight text-slate-950 dark:text-white sm:text-3xl">
+              AI-Generated Document Summary
+            </h1>
+            <Badge variant="blue">Grounded Synthesis</Badge>
+          </div>
+          <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">
             Hierarchical synthesis distinguishing extracted facts, dates, thresholds, and action
             items from interpretation.
           </p>

@@ -18,7 +18,6 @@ import {
   BookOpen,
   Briefcase,
   FileText,
-  KeyRound,
   Lock,
   Plus,
   Shield,
@@ -27,7 +26,7 @@ import {
   Users,
 } from 'lucide-react';
 import { apiRequest } from '../../services/apiClient';
-import { DocumentItem } from '../../types/api';
+import { type DocumentItem } from '../../types/api';
 import {
   Badge,
   Button,
@@ -39,7 +38,7 @@ import {
   Skeleton,
   StatCard,
 } from '../../components/ui/Primitives';
-import { formatBytes, formatDateTime } from '../../utils/format';
+import { formatBytes } from '../../utils/format';
 import { useToast } from '../../hooks/useToast';
 
 interface ManagerOverviewResponse {
@@ -101,15 +100,15 @@ export function TeamOverviewPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+      <div className="page-hero-banner flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-2xl font-bold tracking-tight text-slate-950 dark:text-white sm:text-3xl">
               Team & Workspace Overview
             </h1>
             <Badge variant="info">Manager Scope</Badge>
           </div>
-          <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+          <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">
             Monitor team knowledge assets, member access, and grounded Q&A adoption across your assigned workspaces.
           </p>
         </div>
@@ -288,12 +287,15 @@ export function TeamDocumentsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+      <div className="page-hero-banner flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-            Accessible Team Documents
-          </h1>
-          <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-2xl font-bold tracking-tight text-slate-950 dark:text-white sm:text-3xl">
+              Accessible Team Documents
+            </h1>
+            <Badge variant="info">{docs.length} Documents</Badge>
+          </div>
+          <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">
             Inspect and govern document visibility and role permissions within your managed team workspaces.
           </p>
         </div>
@@ -521,12 +523,15 @@ export function TeamAnalyticsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+      <div className="page-hero-banner flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-            Team Knowledge & RAG Usage Analytics
-          </h1>
-          <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-2xl font-bold tracking-tight text-slate-950 dark:text-white sm:text-3xl">
+              Team Knowledge & RAG Usage Analytics
+            </h1>
+            <Badge variant="emerald">Live Metrics</Badge>
+          </div>
+          <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">
             Real database-backed analytics for document coverage, grounding verification, and answer quality.
           </p>
         </div>
@@ -715,11 +720,14 @@ export function TeamAccessManagementPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-          Team Membership & Document-Access Management
-        </h1>
-        <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+      <div className="page-hero-banner">
+        <div className="flex items-center gap-2.5">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-950 dark:text-white sm:text-3xl">
+            Team Membership & Document-Access Management
+          </h1>
+          <Badge variant="blue">Access Governance</Badge>
+        </div>
+        <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">
           Assign organisation members to workspaces within your managerial scope.
         </p>
       </div>

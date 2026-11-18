@@ -7,7 +7,6 @@ import {
   CheckCheck,
   ExternalLink,
   Eye,
-  FileText,
   Filter,
   KeyRound,
   Lock,
@@ -22,11 +21,11 @@ import {
 } from 'lucide-react';
 import { apiRequest } from '../../services/apiClient';
 import {
-  CitationItem,
-  ConversationItem,
-  NotificationItem,
-  PaginationMeta,
-  SearchResultItem,
+  type CitationItem,
+  type ConversationItem,
+  type NotificationItem,
+  type PaginationMeta,
+  type SearchResultItem,
 } from '../../types/api';
 import {
   Badge,
@@ -34,7 +33,6 @@ import {
   Card,
   EmptyState,
   Input,
-  Modal,
   Select,
   Skeleton,
 } from '../../components/ui/Primitives';
@@ -119,12 +117,15 @@ export function SearchResultsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+      <div className="page-hero-banner flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-            Semantic & Hybrid Knowledge Search
-          </h1>
-          <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-2xl font-bold tracking-tight text-slate-950 dark:text-white sm:text-3xl">
+              Semantic & Hybrid Knowledge Search
+            </h1>
+            <Badge variant="blue">pgvector + BM25</Badge>
+          </div>
+          <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">
             Search across all authorised document chunks using dense embeddings and lexical relevance.
           </p>
         </div>
@@ -382,12 +383,15 @@ export function ConversationHistoryPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+      <div className="page-hero-banner flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-            Conversation History
-          </h1>
-          <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-2xl font-bold tracking-tight text-slate-950 dark:text-white sm:text-3xl">
+              Conversation History
+            </h1>
+            <Badge variant="blue">{items.length} Sessions</Badge>
+          </div>
+          <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">
             Review and resume your grounded Q&A sessions with the SUMIND-IQ Knowledge Assistant.
           </p>
         </div>
@@ -505,11 +509,14 @@ export function FeedbackHistoryPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-          Answer Quality Feedback History
-        </h1>
-        <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+      <div className="page-hero-banner">
+        <div className="flex items-center gap-2.5">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-950 dark:text-white sm:text-3xl">
+            Answer Quality Feedback History
+          </h1>
+          <Badge variant="emerald">Grounding Audit</Badge>
+        </div>
+        <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">
           Track the ratings and citation quality evaluations you have submitted on AI-generated answers.
         </p>
       </div>
@@ -622,12 +629,15 @@ export function NotificationsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+      <div className="page-hero-banner flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-            Processing & Security Notifications
-          </h1>
-          <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-2xl font-bold tracking-tight text-slate-950 dark:text-white sm:text-3xl">
+              Processing & Security Notifications
+            </h1>
+            <Badge variant="blue">{data?.unread_count || 0} Unread</Badge>
+          </div>
+          <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">
             Real-time alerts for document ingestion completions, OCR status, and workspace updates.
           </p>
         </div>
@@ -808,11 +818,14 @@ export function ProfileSettingsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-          User Profile & Security Settings
-        </h1>
-        <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+      <div className="page-hero-banner">
+        <div className="flex items-center gap-2.5">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-950 dark:text-white sm:text-3xl">
+            User Profile & Security Settings
+          </h1>
+          <Badge variant="blue">{user.role.toUpperCase()}</Badge>
+        </div>
+        <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">
           Manage your identity attributes, password credentials, and inspect your active RBAC permissions.
         </p>
       </div>
