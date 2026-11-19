@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  backend:
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+      ALLOW_DEV_DB_FALLBACK: "false"
+      EMAIL_PROVIDER: smtp
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+
+  worker:
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+      ALLOW_DEV_DB_FALLBACK: "false"
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+
+  frontend:
+    ports:
+      - "80:80"
+
