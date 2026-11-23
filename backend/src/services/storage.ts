@@ -150,11 +150,17 @@ export async function deleteStoredFile(params: {
 }
 
 export function getStorageStatus(): Record<string, unknown> {
+  const configured = isS3Configured();
   return {
-    provider: isS3Configured() ? 'aws_s3' : 'aws_s3_local_fallback',
+    provider: configured ? 'aws_s3' : 'aws_s3_local_fallback',
+    mode: configured ? `AWS S3 (${settings.AWS_S3_BUCKET})` : 'Local Private Storage Fallback',
     s3_bucket: settings.AWS_S3_BUCKET,
     aws_region: settings.AWS_REGION,
-    s3_credentials_configured: isS3Configured(),
+    s3_credentials_configured: configured,
+    using_dev_fallback: !configured,
+    fallback_reason: configured
+      ? null
+      : 'AWS S3 credentials not set in .env; storing files privately on local disk with signed download tokens.',
     local_cache_dir: settings.STORAGE_DIR,
     operational: true,
   };

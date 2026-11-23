@@ -18,6 +18,7 @@ import {
 import {
   computeSha256,
   deleteStoredFile,
+  getPresignedS3UrlIfAvailable,
   saveUploadedFile,
 } from '../services/storage.js';
 import type { DocumentDoc, DocumentSummaryDoc, UserRole } from '../types/models.js';
@@ -652,12 +653,29 @@ documentRouter.post('/:documentId/reprocess', requireAuth, async (req, res, next
   }
 });
 
-documentRouter.get('/:documentId/signed-download-url', requireAuth, (req, res, next) => {
+documentRouter.get('/:documentId/signed-download-url', requireAuth, async (req, res, next) => {
   try {
     const ctx = req.authContext!;
     const docId = String(req.params.documentId);
     const rawDoc = mongoDb.collection('documents').find((d) => d.id === docId);
     const doc = enforceDocumentAccess(ctx, rawDoc, 'download', docId);
+
+    // Prefer native AWS S3 presigned URL when document is persisted in S3
+    const s3PresignedUrl = await getPresignedS3UrlIfAvailable({
+      s3Bucket: doc.s3_bucket,
+      s3Key: doc.s3_key,
+      originalFilename: doc.original_filename,
+    });
+
+    if (s3PresignedUrl) {
+      res.json({
+        document_id: doc.id,
+        download_url: s3PresignedUrl,
+        storage_backend: 'aws_s3',
+        expires_in_seconds: 300,
+      });
+      return;
+    }
 
     const token = createSignedDownloadToken({
       userId: ctx.user.id,
@@ -668,6 +686,7 @@ documentRouter.get('/:documentId/signed-download-url', requireAuth, (req, res, n
     res.json({
       document_id: doc.id,
       download_url: `/api/v1/documents/${doc.id}/download?download_token=${token}`,
+      storage_backend: 'local_signed_token',
       expires_in_seconds: 300,
     });
   } catch (err) {

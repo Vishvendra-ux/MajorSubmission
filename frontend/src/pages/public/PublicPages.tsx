@@ -274,13 +274,13 @@ export function LandingPage() {
           {[
             {
               icon: FileSpreadsheet,
-              title: 'Multi-Format Ingestion + OCR',
-              desc: 'Parses PDF, DOCX, PPTX, XLSX, and TXT files asynchronously while preserving page, slide, sheet, and section location labels, with Tesseract OCR for scanned pages.',
+              title: 'Multi-Format Ingestion + Tesseract.js OCR',
+              desc: 'Parses PDF (PDF.js), DOCX (Mammoth.js), PPTX, XLSX (SheetJS), and TXT files asynchronously while preserving page, slide, sheet, and section location labels, with Tesseract.js OCR for scanned pages.',
             },
             {
               icon: Search,
               title: 'Hybrid Semantic + Lexical Search',
-              desc: 'Combines vector cosine similarity (pgvector) with keyword overlap ranking, date/type/workspace filters, and highlighted snippet previews.',
+              desc: 'Combines MongoDB Atlas Vector Search cosine similarity with keyword overlap ranking, date/type/workspace filters, and highlighted snippet previews.',
             },
             {
               icon: Bot,
@@ -377,9 +377,9 @@ export function FeaturesPage() {
               Full-Stack RAG &amp; Ingestion Architecture
             </h1>
             <p className="mt-4 text-base leading-7 text-slate-600 dark:text-slate-300">
-              SUMIND-IQ separates authoritative relational security state (PostgreSQL),
-              document-oriented extraction structures (MongoDB), background job orchestration (Redis
-              &amp; Celery), and replaceable AI/embedding interfaces.
+              SUMIND-IQ runs on a unified Node.js + Express.js backend backed by MongoDB &amp;
+              MongoDB Atlas Vector Search, AWS S3 object storage, BullMQ + Redis background job
+              orchestration, and modular JavaScript LLM/embedding APIs.
             </p>
           </div>
         </div>
@@ -444,13 +444,13 @@ export function FeaturesPage() {
                 <Database className="h-5 w-5" />
               </div>
               <h2 className="text-base font-bold text-slate-900 dark:text-white">
-                Polyglot Persistence &amp; Resilient Dev Fallbacks
+                MongoDB Atlas Vector Search &amp; Resilient Fallbacks
               </h2>
             </div>
             <p className="text-sm leading-6 text-slate-600 dark:text-slate-300">
-              PostgreSQL serves as the single source of truth for identity, ownership, RBAC, and
-              vector chunks, while MongoDB stores extracted section trees and ingestion metadata.
-              Live health endpoints report exact connection and fallback status.
+              MongoDB serves as the unified document and vector store for identity, RBAC, ACL
+              policies, extracted section trees, and 384-d embeddings via Atlas Vector Search, with
+              AWS S3 storage and BullMQ + Redis queues reporting live telemetry on `/api/v1/health`.
             </p>
           </Card>
         </div>
@@ -539,11 +539,12 @@ export function SecurityPage() {
               <Lock className="h-5 w-5" />
             </div>
             <h2 className="text-base font-bold text-slate-900 dark:text-white">
-              Argon2id &amp; Token Rotation
+              JWT &amp; bcrypt Token Rotation
             </h2>
             <p className="text-sm leading-6 text-slate-600 dark:text-slate-400">
-              Passwords are hashed using Argon2id. Short-lived JWT access tokens are paired with
-              revocable, rotated refresh sessions and rate-limited authentication endpoints.
+              Passwords are hashed using bcrypt. Short-lived JWT access tokens are paired with
+              revocable, rotated refresh sessions and rate-limited Express.js authentication
+              endpoints.
             </p>
           </Card>
 

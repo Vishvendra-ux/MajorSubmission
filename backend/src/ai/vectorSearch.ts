@@ -30,15 +30,16 @@ export function computeKeywordOverlapScore(queryText: string, content: string): 
   const qTokens = tokenizeForSearch(queryText);
   if (qTokens.length === 0) return 0;
   const cLower = content.toLowerCase();
-  const cTokenSet = new Set(tokenizeForSearch(content));
+  const cTokens = tokenizeForSearch(content);
+  const cTokenSet = new Set(cTokens);
 
   let matched = 0;
   for (const qt of qTokens) {
-    if (cTokenSet.has(qt) || cLower.includes(qt)) {
+    if (cTokenSet.has(qt)) {
       matched += 1;
-    } else if (qt.length > 4) {
+    } else if (qt.length >= 4) {
       const stem = qt.replace(/(ing|tion|ions|ments|ment|ed|es|s)$/, '');
-      if (stem.length >= 3 && cLower.includes(stem)) {
+      if (stem.length >= 4 && cTokens.some((ct) => ct.startsWith(stem))) {
         matched += 0.8;
       }
     }

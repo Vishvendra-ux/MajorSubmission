@@ -624,7 +624,7 @@ export function ResetPasswordPage() {
             </div>
             <div>
               <h1 className="text-xl font-bold">Set a New Password</h1>
-              <p className="text-xs text-slate-500">Rotate your Argon2id credential hash</p>
+              <p className="text-xs text-slate-500">Rotate your bcrypt credential hash</p>
             </div>
           </div>
           {error && (

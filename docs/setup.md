@@ -1,65 +1,59 @@
-# SUMIND-IQ — Setup & Deployment Guide
+# SUMIND-IQ Setup & Local Development Guide
 
-## 1. Local Development (Standalone Mode)
+SUMIND-IQ runs on a unified **Node.js + TypeScript** stack with **zero Python dependencies**.
 
-### Prerequisites
-- Python 3.9+ / 3.12 (recommended)
-- Node.js 20+ and npm 10+
-- Optional: PostgreSQL 16 (`pgvector`), MongoDB 7, Redis 7, Tesseract OCR (if not running on the host, SUMIND-IQ automatically activates its documented local development fallbacks and reports them via `/api/v1/health`).
+---
 
-### Step 1: Environment Configuration
+## 1. Prerequisites
+- **Node.js** `v20+` and **npm** `v10+`
+- *Optional (for cloud/containerized production)*: MongoDB 7 / MongoDB Atlas, Redis 7, AWS S3 bucket, and a Gemini LLM API key. If absent locally, SUMIND-IQ activates documented embedded fallbacks automatically and reports live status on `/api/v1/health`.
+
+---
+
+## 2. Quick Local Startup (Recommended)
+
+### Step 1 — Install Dependencies
+```bash
+npm install --prefix backend
+npm install --prefix frontend
+```
+
+### Step 2 — Configure Environment (Optional)
 ```bash
 cp .env.example .env
+# Edit .env to add MONGODB_URI, REDIS_URL, AWS_S3_BUCKET, or LLM_API_KEY as needed
 ```
 
-### Step 2: Backend Setup, Migrations & Seed Data
+### Step 3 — Start Backend & Frontend Servers
 ```bash
-cd backend
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+# Terminal 1 — Node.js + Express.js Backend (Port 8000)
+npm run dev --prefix backend
 
-# Run Alembic migrations
-alembic upgrade head
-
-# Seed [DEMO] accounts and multi-format sample documents
-python -m app.db.seed
-
-# Start FastAPI server on http://127.0.0.1:8000
-uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+# Terminal 2 — React + Tailwind CSS Frontend (Port 5173)
+npm run dev --prefix frontend
 ```
 
-### Step 3: Frontend Setup & Dev Server
-```bash
-cd frontend
-npm install
-npm run dev
-```
-Open `http://localhost:5173` in your browser.
+On first startup in `development` mode, the backend automatically seeds roles, permissions, workspaces, demo documents, embeddings, summaries, and demonstration accounts:
+- **Admin**: `admin@sumind-iq.demo` / `Admin@12345`
+- **Manager**: `manager@sumind-iq.demo` / `Manager@12345`
+- **Employee**: `employee@sumind-iq.demo` / `Employee@12345`
+- **Isolated Tenant**: `isolated@zenith.demo` / `Zenith@12345`
+
+### Access URLs
+- **Frontend Application**: `http://127.0.0.1:5173`
+- **Backend API**: `http://127.0.0.1:8000`
+- **Swagger OpenAPI Docs**: `http://127.0.0.1:8000/api/docs`
+- **Health Telemetry**: `http://127.0.0.1:8000/api/v1/health`
 
 ---
 
-## 2. Docker Compose Full-Stack Deployment
-
-To launch the complete polyglot stack (`PostgreSQL 16 + pgvector`, `MongoDB 7`, `Redis 7.4`, `FastAPI Backend`, `Celery Worker`, and `Nginx + React Frontend`):
+## 3. Running with Docker Compose (MongoDB + Redis + Express + Nginx)
 
 ```bash
-docker compose -f infrastructure/docker-compose.yml up --build -d
+docker compose -f infrastructure/docker-compose.yml up --build
 ```
 
-For production hardening:
+For production overrides:
 ```bash
-docker compose -f infrastructure/docker-compose.yml -f infrastructure/docker-compose.prod.yml up --build -d
+docker compose -f infrastructure/docker-compose.yml -f infrastructure/docker-compose.prod.yml up -d --build
 ```
-
----
-
-## 3. Seeded Demonstration Accounts (`[DEMO DATA]`)
-
-| Role | Email | Password | Organisation | Scope |
-|---|---|---|---|---|
-| **Admin** | `admin@sumind-iq.demo` | `Admin@12345` | Apex Global Technologies (Demo) | Full Org, Users, Roles, Audit, Jobs, System Config, Restricted Docs |
-| **Manager** | `manager@sumind-iq.demo` | `Manager@12345` | Apex Global Technologies (Demo) | Engineering & HR Workspaces, Team Docs, Team Analytics |
-| **Employee** | `employee@sumind-iq.demo` | `Employee@12345` | Apex Global Technologies (Demo) | Permitted Org & Engineering Docs, Upload, Search, Grounded Assistant |
-| **Isolated Tenant** | `isolated@zenith.demo` | `Zenith@12345` | Zenith BioLabs Pvt Ltd | Separate tenant for cross-organisation isolation testing |
-

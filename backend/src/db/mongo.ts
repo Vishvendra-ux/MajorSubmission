@@ -304,11 +304,16 @@ class UnifiedMongoStore {
   getStatus(): Record<string, unknown> {
     return {
       engine: this.isConnectedNative ? 'mongodb_native' : 'mongodb_embedded_document_store',
+      mode: this.isConnectedNative ? 'MongoDB Native / Atlas' : 'Embedded MongoDB Store',
       connected: true,
       database_name: settings.MONGODB_DB_NAME,
       vector_search_index: settings.MONGODB_VECTOR_INDEX_NAME,
       atlas_vector_search_enabled: true,
       fallback_active: !this.isConnectedNative,
+      using_dev_fallback: !this.isConnectedNative,
+      fallback_reason: this.isConnectedNative
+        ? null
+        : 'Local MongoDB daemon not detected; using persistent JSON collection store with exact cosine vector search.',
       collections_count: Object.keys(this.store).length,
     };
   }

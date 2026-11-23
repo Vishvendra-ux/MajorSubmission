@@ -7,6 +7,7 @@ import { authRouter } from './routes/authRoutes.js';
 import { documentRouter } from './routes/documentRoutes.js';
 import { chatRouter, searchRouter } from './routes/searchChatRoutes.js';
 import { userAdminRouter } from './routes/userAdminRoutes.js';
+import { apiRateLimiter, authRateLimiter } from './security/rateLimit.js';
 import { HttpError } from './utils/errors.js';
 import { initWorkerQueue } from './workers/queue.js';
 
@@ -103,7 +104,8 @@ export function createApp() {
   });
 
   const prefix = settings.API_V1_PREFIX;
-  app.use(`${prefix}/auth`, authRouter);
+  app.use(`${prefix}/auth`, authRateLimiter, authRouter);
+  app.use(prefix, apiRateLimiter);
   app.use(`${prefix}/documents`, documentRouter);
   app.use(`${prefix}/search`, searchRouter);
   app.use(`${prefix}/chat`, chatRouter);

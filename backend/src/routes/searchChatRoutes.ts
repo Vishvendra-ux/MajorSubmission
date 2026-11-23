@@ -16,36 +16,51 @@ import { HttpError, paginateSequence, sanitizeUserText } from '../utils/errors.j
 export const searchRouter = Router();
 export const chatRouter = Router();
 
-// --- Semantic & Hybrid Search Routes (/api/v1/search) ---
-searchRouter.post('/', requireAuth, async (req, res, next) => {
+// --- Semantic & Hybrid Search Routes (/api/v1/search & /api/v1/search/query) ---
+const handleSearchRequest: import('express').RequestHandler = async (req, res, next) => {
   try {
     const startTime = Date.now();
     const ctx = req.authContext!;
     const {
       query,
-      search_mode = 'hybrid',
+      search_mode,
+      mode,
       workspace_id = null,
       file_type = null,
+      file_types = null,
       owner_id = null,
       document_ids = null,
       date_from = null,
       date_to = null,
       page = 1,
-      page_size = 10,
+      page_size,
+      top_k,
     } = req.body || {};
 
     if (!query || !String(query).trim()) {
       throw new HttpError(400, 'Search query cannot be empty.');
     }
 
+    const effectiveMode: 'hybrid' | 'semantic' | 'keyword' =
+      search_mode || mode || 'hybrid';
+    const effectivePageSize = Number(page_size || top_k || 10);
+    const effectiveFileType =
+      file_type ||
+      (Array.isArray(file_types) && file_types.length === 1 ? String(file_types[0]) : null);
+
     const cleanQuery = sanitizeUserText(String(query), 500);
     let authorisedDocs = getAuthorisedDocuments(ctx, {
       onlyReady: true,
       workspaceId: workspace_id,
-      fileType: file_type,
+      fileType: effectiveFileType,
       ownerId: owner_id,
       scopedDocumentIds: Array.isArray(document_ids) ? document_ids : null,
     });
+
+    if (Array.isArray(file_types) && file_types.length > 1) {
+      const allowedTypes = new Set(file_types.map((ft: unknown) => String(ft).toLowerCase()));
+      authorisedDocs = authorisedDocs.filter((d) => allowedTypes.has(d.file_type));
+    }
 
     if (date_from) {
       const ts = Date.parse(String(date_from));
@@ -69,7 +84,7 @@ searchRouter.post('/', requireAuth, async (req, res, next) => {
       authorisedDocumentIds: authorisedDocIds,
       queryText: cleanQuery,
       queryEmbedding: queryVec,
-      searchMode: search_mode,
+      searchMode: effectiveMode,
       topK: 100,
       minScore: 0.08,
     });
@@ -77,7 +92,7 @@ searchRouter.post('/', requireAuth, async (req, res, next) => {
     const { items: pagedResults, meta: pageMeta } = paginateSequence(
       allRanked,
       Number(page),
-      Number(page_size)
+      effectivePageSize
     );
 
     const wsMap = new Map(
@@ -112,8 +127,11 @@ searchRouter.post('/', requireAuth, async (req, res, next) => {
 
     res.json({
       query: cleanQuery,
-      search_mode,
+      mode: effectiveMode,
+      search_mode: effectiveMode,
       authorised_documents_searched: authorisedDocIds.length,
+      total_authorised_documents: authorisedDocIds.length,
+      results_count: allRanked.length,
       embedding_provider: embedder.providerName,
       embedding_model: embedder.modelName,
       latency_ms: Date.now() - startTime,
@@ -123,7 +141,10 @@ searchRouter.post('/', requireAuth, async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-});
+};
+
+searchRouter.post('/', requireAuth, handleSearchRequest);
+searchRouter.post('/query', requireAuth, handleSearchRequest);
 
 searchRouter.get('/suggestions', requireAuth, (req, res) => {
   const ctx = req.authContext!;

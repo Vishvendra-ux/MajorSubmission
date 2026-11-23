@@ -210,7 +210,7 @@ export function PublicLayout() {
               Terms <span className="text-slate-400">(draft)</span>
             </Link>
             <span className="w-full text-xs text-slate-400 md:w-auto md:border-l md:border-slate-300 md:pl-5 dark:md:border-slate-700">
-              © {new Date().getFullYear()} SUMIND-IQ
+              © {new Date().getFullYear()} SUMIND-IQ. All rights reserved.
             </span>
           </div>
         </div>

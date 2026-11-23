@@ -123,7 +123,7 @@ export function SearchResultsPage() {
             <h1 className="text-2xl font-bold tracking-tight text-slate-950 dark:text-white sm:text-3xl">
               Semantic & Hybrid Knowledge Search
             </h1>
-            <Badge variant="blue">pgvector + BM25</Badge>
+            <Badge variant="blue">Atlas Vector + Lexical</Badge>
           </div>
           <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">
             Search across all authorised document chunks using dense embeddings and lexical relevance.
@@ -800,7 +800,7 @@ export function ProfileSettingsPage() {
       setNewPassword('');
       notify({
         title: 'Password updated',
-        description: 'Your Argon2id password hash has been rotated.',
+        description: 'Your bcrypt password hash has been rotated.',
         variant: 'success',
       });
     } catch (err: unknown) {

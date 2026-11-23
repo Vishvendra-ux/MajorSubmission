@@ -92,8 +92,14 @@ export function getWorkerStatus(): Record<string, unknown> {
   return {
     queue_engine: 'BullMQ + Redis',
     queue_name: settings.BULLMQ_QUEUE_NAME,
+    broker_url: settings.REDIS_URL,
     redis_connected: redisReachable,
+    mode: redisReachable ? 'BullMQ + Redis Worker' : 'In-Process Async Fallback',
     active_mode: redisReachable ? 'bullmq_redis_worker' : 'in_process_fallback_worker',
+    using_dev_fallback: !redisReachable,
+    fallback_reason: redisReachable
+      ? null
+      : 'Redis broker not running locally; dispatching BullMQ ingestion jobs via in-process async worker.',
     in_process_fallback_enabled: settings.ALLOW_IN_PROCESS_WORKER_FALLBACK,
     operational: redisReachable || settings.ALLOW_IN_PROCESS_WORKER_FALLBACK,
   };

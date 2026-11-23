@@ -10,10 +10,13 @@ export interface EmbeddingProvider {
 }
 
 const STOPWORDS = new Set([
+  'a', 'an', 'am', 'as', 'at', 'be', 'by', 'do', 'go', 'he', 'if', 'in', 'is',
+  'it', 'me', 'my', 'no', 'of', 'on', 'or', 'so', 'to', 'up', 'us', 'we',
   'the', 'and', 'for', 'that', 'this', 'with', 'from', 'are', 'was', 'were',
   'will', 'would', 'could', 'should', 'have', 'has', 'had', 'not', 'but',
   'what', 'when', 'where', 'which', 'who', 'whom', 'how', 'why', 'can', 'our',
   'your', 'their', 'into', 'onto', 'upon', 'about', 'across', 'under', 'over',
+  'does', 'did', 'been', 'being', 'many', 'much', 'more', 'most', 'some', 'any',
 ]);
 
 export function tokenizeForSearch(text: string): string[] {

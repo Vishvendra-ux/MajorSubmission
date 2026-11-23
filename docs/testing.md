@@ -1,57 +1,53 @@
-# SUMIND-IQ — Testing & Quality Assurance
+# SUMIND-IQ Automated Testing & Verification Guide
 
-## 1. Backend Automated Tests (`pytest`)
+All backend and frontend tests are written in **TypeScript** and executed with **Vitest** (plus **Playwright** for browser E2E flows).
 
-Located in `backend/tests/test_sumind_iq_backend.py`, the backend test suite verifies:
-1. **Registration, Login, Token Refresh, Logout & Password Reset** (`test_01_auth_register_login_refresh_logout_and_password_reset`).
-2. **RBAC Role Enforcement** across Employee, Manager, and Admin endpoints (`test_02_role_based_access_control_enforcement`).
-3. **Cross-Organisation Tenant Isolation** preventing cross-tenant document access (`test_03_cross_organisation_isolation_and_restricted_document_access`).
-4. **Multi-Format Upload & Magic-Byte Validation** (`PDF`, `DOCX`, `PPTX`, `XLSX`, `TXT`, and spoofed file rejection) (`test_04_multi_format_upload_validation_and_ingestion`).
-5. **Chunking, Metadata & Safe Job Retry** without duplicating chunks (`test_05_chunking_reprocess_and_job_retry_idempotency`).
-6. **Permission-Filtered Semantic & Hybrid Search** (`test_06_permission_filtered_semantic_and_hybrid_search`).
-7. **Grounded RAG Question Answering with Verified Citations** and dynamic citation masking on permission revocation (`test_07_grounded_rag_with_verified_citations_and_permission_recheck`).
-8. **Refusal / Insufficient Evidence Behaviour** when documents do not support an answer (`test_08_insufficient_evidence_refusal_and_prompt_injection_resistance`).
-9. **Hierarchical Document Summary Generation** (`test_09_document_summary_generation_and_regeneration`).
-10. **Answer Feedback Deduplication & Audit Logging** (`test_10_feedback_submission_deduplication_and_audit_logs`).
+---
 
-### Run Backend Tests & Static Checks
+## 1. Backend Integration & Security Tests (`Vitest`)
+
+Located in `backend/tests/backend.test.ts`, the backend test suite executes against the real Express.js application in-process (zero network/port flakiness) and verifies:
+- `/api/v1/health` reporting MongoDB, BullMQ + Redis, AWS S3, and JavaScript Embedding SDK status
+- User registration, duplicate conflict rejection (`409`), `bcrypt` + JWT login, refresh token rotation, and password reset flow
+- Multi-tenant and RBAC document access isolation across Admin, Manager, Employee, and Isolated Tenant (`Zenith BioLabs`)
+- Explicit document `allow` / `deny` access policy overrides
+- Multi-format document ingestion (`PDF` via PDF.js, `DOCX` via Mammoth.js, `XLSX` via SheetJS, `PPTX` via JSZip, and `TXT`) and magic-byte spoofing rejection (`400`)
+- Pre-retrieval permission-filtered hybrid vector search (`/api/v1/search` and `/api/v1/search/query`)
+- Grounded RAG Q&A with verified `[Source N]` citations, insufficient-evidence refusal, and duplicate feedback rejection (`409`)
+- Hierarchical document summaries, rate limiting headers, and Admin governance access guards (`403` for non-admins)
+
 ```bash
-cd backend
-./.venv/bin/pytest tests -v
-./.venv/bin/ruff check app tests
-./.venv/bin/mypy --config-file pyproject.toml app
+# Type-check & run backend suite
+npm run lint --prefix backend
+npm test --prefix backend
 ```
 
 ---
 
-## 2. Frontend Unit & Component Tests (`Vitest` + `React Testing Library`)
+## 2. Frontend Unit & Component Tests (`Vitest + React Testing Library`)
 
-Located in `frontend/tests/app.test.tsx`, the frontend test suite verifies:
-- Landing page problem/solution presentation and navigation links.
-- Login form validation and `[DEMO DATA]` role credential switchers.
-- Registration form validation and password complexity checks.
-- Document upload page controls, format dropzone, and role permissions.
-- Semantic search page retrieval mode selectors and sample queries.
-- `CitationCard` rendering for accessible sources vs. revoked/restricted sources.
-- `EmptyState`, `ErrorState`, `StatusBadge`, and `AccessDeniedPage` components.
+Located in `frontend/tests/app.test.tsx`, verifying LandingPage, LoginPage demo quick-fill & validation, RegisterPage password strength checks, UploadDocumentsPage, SearchResultsPage, CitationCard (accessible & revoked states), UI primitives, and AccessDeniedPage.
 
-### Run Frontend Tests & Build
 ```bash
-cd frontend
+npm test --prefix frontend
+npm run build --prefix frontend
+```
+
+---
+
+## 3. Run Everything in One Command
+
+From the project root:
+```bash
 npm test
 npm run build
 ```
 
 ---
 
-## 3. End-to-End Playwright Flow (`frontend/e2e/sumind-iq.spec.ts`)
+## 4. End-to-End Browser Verification (`Playwright`)
 
-Covers the full 8-step user journey:
-1. Login as Employee.
-2. Verify RBAC protection on `/app/admin/users` (`AccessDeniedPage`).
-3. Upload a sample document and verify `READY` indexing state.
-4. Search for a term from the uploaded document.
-5. Ask a grounded question in the AI Assistant and verify cited answer.
-6. Ask an unsupported question and verify explicit "Insufficient Evidence" refusal.
-7. View AI-generated executive document summary.
-
+With both backend (`:8000`) and frontend (`:5173`) servers running:
+```bash
+npx --prefix frontend playwright test
+```

@@ -6,9 +6,11 @@ test.describe('SUMIND-IQ End-to-End Platform Verification', () => {
   }) => {
     // 1. User logs in as Employee first to test RBAC & document upload
     await page.goto('/login');
-    await expect(page.getByText('Sign in to SUMIND-IQ')).toBeVisible();
+    await expect(
+      page.getByText(/Sign in to continue to your knowledge workspace/i)
+    ).toBeVisible();
     await page.getByRole('button', { name: /Employee/i }).click();
-    await page.getByRole('button', { name: /Sign In to Workspace/i }).click();
+    await page.getByRole('button', { name: /Sign in to workspace/i }).click();
 
     await expect(page).toHaveURL(/\/app\/dashboard/);
 

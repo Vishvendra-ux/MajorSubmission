@@ -1,32 +1,39 @@
-# SUMIND-IQ — Cybersecurity & Access Control Engineering
+# SUMIND-IQ Security Architecture
 
-## 1. Threat Model & Defence-in-Depth
+SUMIND-IQ applies defense-in-depth across authentication, multi-tenant isolation, pre-retrieval RBAC, file ingestion, rate limiting, and audit logging.
 
-SUMIND-IQ implements server-side security controls across 6 layers:
+---
 
-1. **Authentication & Credential Security (`backend/app/security/passwords.py`, `jwt.py`)**:
-   - Passwords are hashed using **Argon2id** (with constant-time verification and complexity enforcement).
-   - Short-lived JWT Access Tokens (`HS256`, 30-minute default expiry) are paired with revocable, database-tracked Refresh Sessions (`RefreshSession`) rotated on every `/auth/refresh` call.
-   - Generic authentication errors (`"Invalid email or password credentials."` and generic forgot-password responses) prevent account enumeration.
-   - Sliding-window rate limiting (`enforce_auth_rate_limit`, `enforce_api_rate_limit`) protects authentication and AI endpoints.
+## 1. Authentication & Credential Security (`JWT + bcrypt`)
+- **Password Hashing**: Passwords are hashed using **bcrypt** (`bcryptjs`, cost factor 10) with strict password strength validation (minimum 8 characters, uppercase, lowercase, and numeric/special character).
+- **JWT Access & Refresh Rotation**:
+  - Short-lived signed JWT access tokens (`type: "access"`) carry `sub` (user ID), `org` (organisation ID), `role`, and `jti`.
+  - Refresh tokens (`type: "refresh"`) are stored only as SHA-256 hashes in the `refresh_sessions` MongoDB collection and rotated/revoked on every refresh, logout, or password reset.
+- **Anti-Enumeration**: Registration conflict and forgot-password endpoints return generic responses so attackers cannot probe valid emails.
 
-2. **Three-Tier RBAC & Multi-Tenant Isolation (`backend/app/security/rbac.py`, `permissions.py`)**:
-   - Every database table and query is scoped by `organisation_id`.
-   - Attempting to access another organisation's document, preview, download, summary, or conversation by manipulating UUID parameters returns `HTTP 403 Forbidden` and writes a `denied` entry to `AuditLog`.
-   - Roles (`admin`, `manager`, `employee`), workspace memberships (`WorkspaceMembership`), document `visibility` (`organisation`, `workspace`, `restricted`), and explicit `DocumentAccessPolicy` (`allow` / `deny`, where `deny` always takes precedence) are evaluated before any data or vector search is returned.
+---
 
-3. **File Upload Validation & Non-Public Storage (`backend/app/ingestion/validator.py`, `utils/storage.py`)**:
-   - Files are validated by extension, MIME type, AND actual magic-byte / ZIP container structure (`%PDF-`, OOXML `word/document.xml`, `ppt/presentation.xml`, `xl/workbook.xml`, UTF-8 decoding).
-   - Executable or spoofed files are rejected with `HTTP 400`.
-   - Uploaded files are stored outside static web roots using randomized UUID filenames with strict `Path.resolve().relative_to(UPLOAD_ROOT)` path-traversal protection.
+## 2. Multi-Tenant Isolation & Pre-Retrieval RBAC
+- Every database record (`documents`, `document_chunks`, `conversations`, `messages`, `workspaces`, `audit_logs`, `processing_jobs`) is scoped to an `organisation_id`.
+- **6-Rule Document Access Evaluator** (`backend/src/security/auth.ts` -> `canAccessDocument`):
+  1. **Cross-Tenant Block**: Rejects any document outside the user's `organisation_id` (`HTTP 403` + `security.cross_org_document_denied` audit log).
+  2. **Explicit `DENY` Policies**: User, role, or workspace `deny` policies override all allow rules.
+  3. **Admin & Uploader**: Organisation Admins and document uploaders retain full access within their tenant.
+  4. **Explicit `ALLOW` Policies**: Granular `view`, `download`, or `manage` grants for users, roles, or workspaces.
+  5. **Restricted Classification**: `visibility === "restricted"` denies access unless covered by Admin, Uploader, or an explicit Allow policy.
+  6. **Role & Workspace Scope**: Validates `allowed_roles` and `workspace` membership before retrieval.
+- **Historical Citation Re-Verification**: Whenever a user re-opens a past conversation, `GET /api/v1/chat/conversations/:id` re-checks `canAccessDocument` for every cited document and redacts excerpts if access was revoked.
 
-4. **Prompt-Injection Defence & Grounding Verification (`backend/app/security/sanitization.py`, `ai/citation_validator.py`)**:
-   - Extracted document text is treated as untrusted data. Known prompt-injection patterns (`ignore previous instructions`, `reveal system prompt`, etc.) are detected and sanitized during ingestion (`cleaner.py`) and RAG prompt assembly.
-   - Retrieved passages are isolated inside `<untrusted_document_evidence>` XML tags.
-   - `CitationValidator` verifies that every `[Source N]` citation in an answer maps to an actual retrieved chunk from an authorised document.
-   - Historical conversation views re-verify document access permissions dynamically so revoked documents cannot leak through old chat transcripts.
+---
 
-5. **HTTP Security Headers (`backend/app/core/middleware.py`)**:
-   - Every response includes `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy`, and `Content-Security-Policy`.
-   - Every request/response carries an `X-Request-ID` correlation header.
+## 3. Zero-Hallucination Citation Validation
+- Every `[Source N]` reference produced by the LLM API is verified by `validateAndExtractCitations()` (`backend/src/ai/llm.ts`) against the exact chunks returned from pre-filtered vector search.
+- Fabricated citation indices are stripped, and questions lacking authorised evidence receive an explicit refusal (`evidence_sufficient: false`).
 
+---
+
+## 4. Upload Validation, Private S3 Storage & Rate Limiting
+- **Magic-Byte Inspection**: Validates `%PDF-` headers for PDFs, `PK` ZIP headers for `DOCX`/`PPTX`/`XLSX`, and rejects binary null bytes in `.txt` uploads (`backend/src/ingestion/pipeline.ts`).
+- **Private Storage & Presigned URLs**: Original files are stored privately in **AWS S3** (or outside public web roots locally) with randomized internal filenames and served exclusively through short-lived S3 presigned URLs or JWT-signed download tokens (`expiresIn: 300s`).
+- **Express Rate Limiting**: In-memory sliding-window rate limiters protect `/api/v1/auth/*` (`AUTH_RATE_LIMIT_PER_MINUTE`) and general `/api/v1/*` routes (`API_RATE_LIMIT_PER_MINUTE`), returning `HTTP 429` with `Retry-After` headers on abuse.
+- **HTTP Security Headers**: `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, and strict CORS allowlists.

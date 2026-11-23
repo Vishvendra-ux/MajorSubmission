@@ -87,9 +87,9 @@ export async function generateGroundedRagResponse(params: {
 }): Promise<GroundedRagResult> {
   const qTokens = tokenizeForSearch(params.question);
   const relevantChunks = params.rankedChunks.filter((r) => {
-    if (r.keywordScore > 0) return true;
-    const textLower = `${r.document.title} ${r.chunk.content}`.toLowerCase();
-    return qTokens.some((qt) => textLower.includes(qt));
+    if (r.keywordScore >= 0.15) return true;
+    const docTokens = new Set(tokenizeForSearch(`${r.document.title} ${r.chunk.content}`));
+    return qTokens.some((qt) => docTokens.has(qt));
   });
 
   if (relevantChunks.length === 0) {

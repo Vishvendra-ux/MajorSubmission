@@ -86,19 +86,26 @@ export function AdminOverviewPage() {
         };
         recent_audit_logs: AuditLogItem[];
         service_status: {
-          postgresql: {
+          mongodb: {
             engine: string;
+            mode: string;
+            database_name?: string;
+            vector_search_index?: string;
             using_dev_fallback: boolean;
             fallback_reason?: string | null;
           };
-          mongodb: {
+          storage?: {
+            provider: string;
             mode: string;
+            s3_bucket?: string;
             using_dev_fallback: boolean;
             fallback_reason?: string | null;
           };
           worker: {
             mode: string;
+            queue_engine?: string;
             using_dev_fallback: boolean;
+            fallback_reason?: string | null;
           };
         };
       }>('/admin/dashboard'),
@@ -232,38 +239,45 @@ export function AdminOverviewPage() {
           <div className="mt-4 space-y-4 text-sm">
             <div className="rounded-lg border border-slate-200 p-3 dark:border-slate-800">
               <div className="flex items-center justify-between">
-                <span className="font-medium">Authoritative RDBMS</span>
-                <Badge
-                  variant={
-                    data?.service_status.postgresql.using_dev_fallback ? 'warning' : 'success'
-                  }
-                >
-                  {data?.service_status.postgresql.engine}
-                </Badge>
-              </div>
-              {data?.service_status.postgresql.using_dev_fallback && (
-                <p className="mt-1 text-xs text-slate-500">
-                  Dev Fallback Active: {data.service_status.postgresql.fallback_reason}
-                </p>
-              )}
-            </div>
-
-            <div className="rounded-lg border border-slate-200 p-3 dark:border-slate-800">
-              <div className="flex items-center justify-between">
-                <span className="font-medium">Document Metadata Store</span>
+                <span className="font-medium">MongoDB &amp; Atlas Vector Search</span>
                 <Badge
                   variant={
                     data?.service_status.mongodb.using_dev_fallback ? 'warning' : 'success'
                   }
                 >
-                  {data?.service_status.mongodb.mode}
+                  {data?.service_status.mongodb.mode || data?.service_status.mongodb.engine}
                 </Badge>
               </div>
+              {data?.service_status.mongodb.using_dev_fallback &&
+                data.service_status.mongodb.fallback_reason && (
+                  <p className="mt-1 text-xs text-slate-500">
+                    Dev Fallback Active: {data.service_status.mongodb.fallback_reason}
+                  </p>
+                )}
             </div>
 
             <div className="rounded-lg border border-slate-200 p-3 dark:border-slate-800">
               <div className="flex items-center justify-between">
-                <span className="font-medium">Background Worker</span>
+                <span className="font-medium">AWS S3 File Storage</span>
+                <Badge
+                  variant={
+                    data?.service_status.storage?.using_dev_fallback ? 'info' : 'success'
+                  }
+                >
+                  {data?.service_status.storage?.mode || 'aws_s3_local_fallback'}
+                </Badge>
+              </div>
+              {data?.service_status.storage?.using_dev_fallback &&
+                data.service_status.storage?.fallback_reason && (
+                  <p className="mt-1 text-xs text-slate-500">
+                    {data.service_status.storage.fallback_reason}
+                  </p>
+                )}
+            </div>
+
+            <div className="rounded-lg border border-slate-200 p-3 dark:border-slate-800">
+              <div className="flex items-center justify-between">
+                <span className="font-medium">Background Worker (BullMQ + Redis)</span>
                 <Badge
                   variant={
                     data?.service_status.worker.using_dev_fallback ? 'info' : 'success'
@@ -272,6 +286,12 @@ export function AdminOverviewPage() {
                   {data?.service_status.worker.mode}
                 </Badge>
               </div>
+              {data?.service_status.worker.using_dev_fallback &&
+                data.service_status.worker.fallback_reason && (
+                  <p className="mt-1 text-xs text-slate-500">
+                    {data.service_status.worker.fallback_reason}
+                  </p>
+                )}
             </div>
           </div>
         </Card>
@@ -521,7 +541,7 @@ export function RolePermissionPage() {
           <Badge variant="emerald">Zero-Trust Policies</Badge>
         </div>
         <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">
-          Authoritative permission definitions enforced on every FastAPI backend endpoint and database query.
+          Authoritative permission definitions enforced on every Express.js backend endpoint and MongoDB query.
         </p>
       </div>
 
@@ -1184,7 +1204,7 @@ export function UsageAnalyticsPage() {
             <Badge variant="brand">Live Telemetry</Badge>
           </div>
           <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">
-            Real-time telemetry calculated directly from PostgreSQL records.
+            Real-time telemetry calculated directly from MongoDB collections.
           </p>
         </div>
         <div className="w-44">
@@ -1609,7 +1629,7 @@ export function SystemConfigPage() {
                     onChange={(e) => setOcrEnabled(e.target.checked)}
                     className="h-4 w-4 rounded border-slate-300 text-brand-600"
                   />
-                  Enable Tesseract OCR for Scanned PDFs
+                  Enable Tesseract.js OCR for Scanned PDFs
                 </label>
               </div>
             </div>

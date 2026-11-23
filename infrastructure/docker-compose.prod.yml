@@ -5,19 +5,9 @@ services:
     environment:
       APP_ENV: production
       APP_DEBUG: "false"
-      ALLOW_DEV_DB_FALLBACK: "false"
+      ALLOW_LOCAL_MONGO_FALLBACK: "false"
+      ALLOW_IN_PROCESS_WORKER_FALLBACK: "false"
       EMAIL_PROVIDER: smtp
-    deploy:
-      resources:
-        limits:
-          cpus: "2.0"
-          memory: 2G
-
-  worker:
-    environment:
-      APP_ENV: production
-      APP_DEBUG: "false"
-      ALLOW_DEV_DB_FALLBACK: "false"
     deploy:
       resources:
         limits:
@@ -27,4 +17,3 @@ services:
   frontend:
     ports:
       - "80:80"
-
