@@ -1,102 +1,68 @@
-# SUMIND-IQ — Full-Stack AI Organisational Knowledge Management Platform
+# SUMIND-IQ — Enterprise AI Knowledge Management Platform
 
-**SUMIND-IQ** is a production-minded, secure, role-aware organisational knowledge management and grounded Retrieval-Augmented Generation (RAG) platform. It transforms scattered internal company documents (`PDF`, `DOCX`, `PPTX`, `XLSX`, `TXT`) into a permission-enforced searchable knowledge base with verifiable page, slide, sheet, and section citations.
-
----
-
-## Key Engineering Highlights
-
-1. **Strict Grounding & Anti-Hallucination Engine**:
-   - Every AI-generated answer is grounded strictly in retrieved document chunks that the requesting user is authorised to access.
-   - If the authorised knowledge base does not contain sufficient evidence to answer a question, SUMIND-IQ explicitly states that it could not find enough evidence rather than inventing an answer.
-   - `CitationValidator` verifies every `[Source N]` reference against authoritative database chunk records and strips any unverified citation.
-   - Re-opening historical conversations dynamically re-verifies current document permissions so revoked documents cannot leak through past chat history.
-
-2. **17-Stage Multi-Format Document Ingestion Pipeline**:
-   - Supports **PDF** (`PyMuPDF` + `Tesseract OCR` fallback), **DOCX** (`python-docx`), **PPTX** (`python-pptx`), **XLSX** (`openpyxl`), and **TXT**.
-   - Validates extension, MIME type, and actual magic-byte / ZIP container structure before storing files outside public static directories with SHA-256 checksums.
-   - Preserves source location labels (`Page N`, `Slide N`, `Sheet '...'`, `Section N`) across overlapping sliding-window chunks.
-   - Supports idempotent job retries without creating duplicate chunks.
-
-3. **Three-Tier RBAC & Multi-Tenant Isolation**:
-   - Enforces **Admin**, **Manager**, and **Employee** roles alongside Organisation boundaries, Departmental Workspaces, Document Visibility (`organisation`, `workspace`, `restricted`), and explicit `allow`/`deny` Access Control Policies on every backend endpoint.
-   - Argon2id password hashing, JWT access tokens, rotated refresh sessions, auth rate limiting, security headers, and immutable security audit logs.
-
-4. **Complete Enterprise SaaS Frontend (33 Views Across 4 Scopes)**:
-   - **Public (8)**: Landing, Features, Security & Privacy, Login, Register, Forgot Password, Reset Password, Legal Placeholders (`Privacy`, `Terms`), Not Found (`404`).
-   - **Authenticated Workspace (12)**: Overview Dashboard, AI Knowledge Assistant, Semantic & Hybrid Search, Document Library, Upload Documents, Document Detail & Chunk Preview, AI Document Summary, Conversation History, Feedback History, Notifications, User Profile & Security Settings, Access Denied (`403`).
-   - **Manager Scope (4)**: Team Overview, Accessible Team Documents, Team Usage Analytics, Team Membership & Access Management.
-   - **Admin Governance (9)**: Admin Overview, User Management, Role & Permission Matrix, Organisation & Workspace Management, Document Governance, Security Audit Logs, Usage Analytics, Job & Failure Monitoring, System Configuration.
+**SUMIND-IQ** is a full-stack, multi-tenant enterprise AI knowledge management and grounded Retrieval-Augmented Generation (RAG) platform built on a 100% **JavaScript / TypeScript** stack (**React.js + Tailwind CSS** on the frontend and **Node.js + Express.js + MongoDB** on the backend).
 
 ---
 
-## Repository Structure
+## Technology Stack
 
-```text
-sumind-iq/
-├── frontend/                  # React 18 + Vite + TypeScript + Tailwind CSS + TanStack Query + Recharts
-│   ├── src/
-│   │   ├── components/        # Reusable UI Primitives, BrandLogo, CitationCard, SourcePreviewModal, SafeMarkdown
-│   │   ├── hooks/             # useAuth, useTheme, useToast
-│   │   ├── layouts/           # PublicLayout, ProtectedRoute, AppLayout (collapsible sidebar + Cmd+K search)
-│   │   ├── pages/             # public/, app/, manager/, admin/
-│   │   ├── services/          # apiClient with automatic JWT refresh token rotation
-│   │   ├── styles/            # Tailwind CSS + enterprise design tokens
-│   │   ├── types/             # Strict TypeScript API contracts
-│   │   └── utils/             # Formatting & class helpers
-│   ├── tests/                 # Vitest + React Testing Library suite
-│   └── e2e/                   # Playwright end-to-end test suite
-├── backend/                   # Python FastAPI + SQLAlchemy 2.x + Alembic + Pydantic v2
-│   ├── app/
-│   │   ├── api/v1/            # auth, documents, search, chat, users, admin
-│   │   ├── ai/                # Provider-agnostic LLM, Embeddings & CitationValidator
-│   │   ├── core/              # Config, Logging, Exceptions, Rate Limiting, Security Headers
-│   │   ├── db/                # SQLAlchemy session, health telemetry & [DEMO] seed data
-│   │   ├── ingestion/         # Magic-byte validator, PDF/DOCX/PPTX/XLSX/TXT extractors, OCR, cleaner, chunker
-│   │   ├── models/            # 20 SQLAlchemy 2.x relational & vector entities
-│   │   ├── repositories/      # Hybrid vector/keyword search & modular MongoDB repository
-│   │   ├── schemas/           # Pydantic v2 request/response schemas
-│   │   ├── security/          # Argon2id, JWT, RBAC dependencies, ACL engine, prompt sanitization
-│   │   ├── utils/             # SHA-256, non-public storage & signed downloads, pagination
-│   │   └── workers/           # Celery worker tasks with in-process local dev fallback
-│   ├── migrations/            # Alembic schema migrations
-│   └── tests/                 # Pytest integration & security test suite
-├── infrastructure/
-│   ├── docker-compose.yml     # PostgreSQL (pgvector), MongoDB, Redis, Backend, Worker, Frontend
-│   ├── docker-compose.prod.yml
-│   └── deployment/nginx.conf
-├── docs/                      # Architecture, API, Database ER Diagram, Security, Setup & Testing docs
-├── .github/workflows/ci.yml   # GitHub Actions CI pipeline
-└── .env.example               # Documented environment variables
-```
+| Layer | Technology |
+| :--- | :--- |
+| **Frontend** | React.js + Tailwind CSS (Vite + TypeScript + TanStack Query + Recharts) |
+| **Backend** | Node.js + Express.js (TypeScript) |
+| **Database** | MongoDB (with persistent local embedded MongoDB document store fallback) |
+| **Authentication** | JWT + bcrypt (`jsonwebtoken` + `bcryptjs`) |
+| **AI Integration** | LLM API (Gemini API + deterministic zero-hallucination extractive verifier) |
+| **Embeddings** | JavaScript Embedding SDK/API (384-d semantic vectors) |
+| **Vector Search** | MongoDB Atlas Vector Search (`$vectorSearch` pipeline + hybrid lexical ranking) |
+| **Document Processing** | PDF.js (`pdfjs-dist`), Mammoth.js (`mammoth`), SheetJS (`xlsx`), JSZip (`pptx`) |
+| **OCR** | Tesseract.js (`tesseract.js`) |
+| **File Storage** | AWS S3 (`@aws-sdk/client-s3` + presigned URLs, with local disk fallback) |
+| **Background Jobs** | BullMQ + Redis (`bullmq` + `ioredis`, with in-process async worker fallback) |
 
 ---
 
-## Quick Start
+## Quick Start (Zero Python Required)
 
-### 1. Backend
+### 1. Install Dependencies
 ```bash
-cd backend
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-alembic upgrade head
-python -m app.db.seed
-uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+npm install --prefix backend
+npm install --prefix frontend
 ```
 
-### 2. Frontend
+### 2. Run Backend & Frontend Servers
 ```bash
-cd frontend
-npm install
-npm run dev
+# Terminal 1 — Start Node.js + Express.js Backend (Port 8000)
+npm run dev --prefix backend
+
+# Terminal 2 — Start React + Tailwind CSS Frontend (Port 5173)
+npm run dev --prefix frontend
 ```
 
-### 3. Seeded Demo Accounts (`[DEMO DATA]`)
-- **Admin**: `admin@sumind-iq.demo` / `Admin@12345`
-- **Manager**: `manager@sumind-iq.demo` / `Manager@12345`
-- **Employee**: `employee@sumind-iq.demo` / `Employee@12345`
-- **Isolated Second Tenant**: `isolated@zenith.demo` / `Zenith@12345`
+- **Frontend UI**: [http://127.0.0.1:5173](http://127.0.0.1:5173)
+- **Backend API**: [http://127.0.0.1:8000](http://127.0.0.1:8000)
+- **Interactive API Docs**: [http://127.0.0.1:8000/api/docs](http://127.0.0.1:8000/api/docs)
+- **Health Check**: [http://127.0.0.1:8000/api/v1/health](http://127.0.0.1:8000/api/v1/health)
 
-See [`docs/architecture.md`](docs/architecture.md), [`docs/api.md`](docs/api.md), [`docs/database.md`](docs/database.md), [`docs/security.md`](docs/security.md), [`docs/setup.md`](docs/setup.md), and [`docs/testing.md`](docs/testing.md) for full technical documentation.
+---
 
+## Pre-Seeded Demonstration Accounts
+
+| Role | Email | Password | Access Scope |
+| :--- | :--- | :--- | :--- |
+| **Admin** | `admin@sumind-iq.demo` | `Admin@12345` | Full organisation governance, users, roles, audit logs, all 4 demo documents |
+| **Manager** | `manager@sumind-iq.demo` | `Manager@12345` | Workspace management, team analytics, 3 non-restricted documents |
+| **Employee** | `employee@sumind-iq.demo` | `Employee@12345` | Semantic search, grounded Q&A, summaries on 2 organisation-wide documents |
+| **Isolated Tenant** | `isolated@zenith.demo` | `Zenith@12345` | Separate tenant (`Zenith BioLabs`) for cross-tenant isolation verification |
+
+---
+
+## Running Automated Tests
+
+```bash
+# Run Backend Integration & Security Suite (Vitest + Supertest)
+npm test --prefix backend
+
+# Run Frontend Component & UI Suite (Vitest + Testing Library)
+npm test --prefix frontend
+```

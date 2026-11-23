@@ -1,5 +1,29 @@
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '') || '/api/v1';
+function getDefaultApiBaseUrl(): string {
+  const configured = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '');
+  if (configured) {
+    return configured;
+  }
+  if (
+    typeof window !== 'undefined' &&
+    window.location.port === '5173' &&
+    (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost')
+  ) {
+    return `http://${window.location.hostname}:8000/api/v1`;
+  }
+  return '/api/v1';
+}
+
+export const API_BASE_URL = getDefaultApiBaseUrl();
+
+export function resolveApiUrl(urlOrPath: string): string {
+  if (urlOrPath.startsWith('http://') || urlOrPath.startsWith('https://')) {
+    return urlOrPath;
+  }
+  if (urlOrPath.startsWith('/api/v1')) {
+    return `${API_BASE_URL}${urlOrPath.slice('/api/v1'.length)}`;
+  }
+  return `${API_BASE_URL}${urlOrPath.startsWith('/') ? '' : '/'}${urlOrPath}`;
+}
 
 const ACCESS_TOKEN_KEY = 'sumindiq_access_token';
 const REFRESH_TOKEN_KEY = 'sumindiq_refresh_token';

@@ -4,14 +4,19 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
+  ArrowRight,
+  Briefcase,
   CheckCircle2,
+  Eye,
+  EyeOff,
   FileSearch,
+  Fingerprint,
   KeyRound,
   Lock,
   Mail,
   ShieldCheck,
   Sparkles,
-  UserCheck,
+  UserRound,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/useToast';
@@ -30,6 +35,7 @@ export function LoginPage() {
   const navigate = useNavigate();
   const [serverError, setServerError] = useState<string | null>(null);
   const [selectedDemoRole, setSelectedDemoRole] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -52,196 +58,288 @@ export function LoginPage() {
       });
       navigate('/app/dashboard');
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Invalid credentials';
-      setServerError(msg);
+      setServerError(
+        err instanceof Error ? err.message : 'Invalid credentials',
+      );
     }
   };
 
-  const fillDemoAccount = (roleName: string, email: string, pass: string) => {
-    setSelectedDemoRole(roleName);
+  const fillDemoAccount = (role: string, email: string, password: string) => {
+    setSelectedDemoRole(role);
+    setServerError(null);
     setValue('email', email, { shouldValidate: true });
-    setValue('password', pass, { shouldValidate: true });
+    setValue('password', password, { shouldValidate: true });
   };
 
+  const demoAccounts = [
+    {
+      role: 'admin',
+      label: 'Admin',
+      note: 'Full scope',
+      email: 'admin@sumind-iq.demo',
+      password: 'Admin@12345',
+      icon: ShieldCheck,
+      color: 'text-blue-600 dark:text-blue-400',
+    },
+    {
+      role: 'manager',
+      label: 'Manager',
+      note: 'Team scope',
+      email: 'manager@sumind-iq.demo',
+      password: 'Manager@12345',
+      icon: Briefcase,
+      color: 'text-emerald-600 dark:text-emerald-400',
+    },
+    {
+      role: 'employee',
+      label: 'Employee',
+      note: 'Standard',
+      email: 'employee@sumind-iq.demo',
+      password: 'Employee@12345',
+      icon: UserRound,
+      color: 'text-indigo-600 dark:text-indigo-400',
+    },
+  ];
+
+  const features = [
+    {
+      icon: ShieldCheck,
+      title: 'Access-aware search',
+      desc: 'Results follow your workspace permissions.',
+    },
+    {
+      icon: FileSearch,
+      title: 'Source citations',
+      desc: 'Open the page, slide, or section behind an answer.',
+    },
+    {
+      icon: CheckCircle2,
+      title: 'Evidence checks',
+      desc: 'Unsupported questions can be clearly refused.',
+    },
+    {
+      icon: Fingerprint,
+      title: 'Role-scoped tools',
+      desc: 'Each workspace role gets its own capabilities.',
+    },
+  ];
+
   return (
-    <div className="landing-hero relative isolate min-h-[calc(100vh-144px)] px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+    <div className="landing-hero relative isolate flex min-h-[calc(100vh-144px)] items-center overflow-hidden px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
       <div
         aria-hidden="true"
-        className="landing-grid pointer-events-none absolute inset-x-0 top-0 h-[36rem] opacity-60"
+        className="landing-grid pointer-events-none absolute inset-0 opacity-55"
       />
-      <div className="relative mx-auto grid max-w-5xl items-center gap-10 lg:grid-cols-[0.95fr_1.05fr]">
-        {/* Left Informational Showcase Panel */}
-        <div className="hidden space-y-6 lg:block">
-          <Badge variant="blue" className="gap-1.5">
-            <Sparkles className="h-3.5 w-3.5" />
-            Zero-Trust Enterprise Knowledge Console
-          </Badge>
-          <h2 className="text-3xl font-extrabold leading-tight tracking-tight text-slate-950 dark:text-white sm:text-4xl">
-            Every answer verified against your{' '}
-            <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-transparent dark:from-blue-400 dark:to-indigo-300">
-              authorised documents.
-            </span>
-          </h2>
-          <p className="text-sm leading-6 text-slate-600 dark:text-slate-300">
-            Sign in to access your organisation’s multi-format knowledge base, semantic search
-            engine, grounded AI assistant, and role-scoped governance dashboards.
-          </p>
-
-          <div className="space-y-3 pt-2">
-            {[
-              {
-                icon: ShieldCheck,
-                title: 'Pre-Retrieval RBAC Enforcement',
-                desc: 'Admin, Manager, and Employee permissions are verified before vector search runs.',
-              },
-              {
-                icon: FileSearch,
-                title: 'Clickable Page, Slide & Sheet Citations',
-                desc: 'Inspect exact cited passages with confidence scores and source location labels.',
-              },
-              {
-                icon: CheckCircle2,
-                title: 'Explicit Refusal When Evidence Is Missing',
-                desc: 'Prevents hallucinated policies by refusing unsupported questions.',
-              },
-            ].map((item) => {
-              const Icon = item.icon;
-              return (
-                <div
-                  key={item.title}
-                  className="flex items-start gap-3.5 rounded-2xl border border-slate-200/80 bg-white/80 p-3.5 shadow-2xs backdrop-blur dark:border-slate-800 dark:bg-slate-900/70"
-                >
-                  <div className="icon-tile h-10 w-10">
-                    <Icon className="h-4 w-4" />
+      <div className="relative mx-auto grid w-full max-w-6xl items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
+        <div className="hidden lg:block">
+          <div className="max-w-xl">
+            <Badge
+              variant="blue"
+              className="gap-2 rounded-full border-blue-200/80 bg-white/80 px-3.5 py-1.5 text-[11px] shadow-sm dark:border-blue-900 dark:bg-slate-900/80"
+            >
+              <Sparkles className="h-3.5 w-3.5" /> A clearer way to use team
+              knowledge
+            </Badge>
+            <h1 className="mt-6 text-4xl font-extrabold leading-[1.1] tracking-[-0.04em] text-slate-950 dark:text-white xl:text-5xl">
+              Find the answer.{' '}
+              <span className="bg-gradient-to-r from-blue-700 via-indigo-600 to-violet-600 bg-clip-text text-transparent dark:from-blue-300 dark:via-indigo-300 dark:to-violet-300">
+                See the source.
+              </span>
+            </h1>
+            <p className="mt-5 max-w-lg text-[15px] leading-7 text-slate-600 dark:text-slate-300">
+              Sign in to search your organisation’s documents and work with
+              answers connected to their source material.
+            </p>
+            <div className="mt-8 grid gap-3 sm:grid-cols-2">
+              {features.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <div
+                    key={item.title}
+                    className="flex items-start gap-3 rounded-2xl border border-slate-200/80 bg-white/75 p-4 shadow-sm backdrop-blur dark:border-slate-800 dark:bg-slate-900/75"
+                  >
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-50 to-indigo-100 text-blue-700 ring-1 ring-blue-100 dark:from-blue-950/70 dark:to-indigo-950/70 dark:text-blue-300 dark:ring-blue-900/70">
+                      <Icon className="h-[17px] w-[17px] stroke-[1.8]" />
+                    </span>
+                    <span>
+                      <span className="block text-xs font-bold text-slate-900 dark:text-white">
+                        {item.title}
+                      </span>
+                      <span className="mt-1 block text-[11px] leading-4 text-slate-500 dark:text-slate-400">
+                        {item.desc}
+                      </span>
+                    </span>
                   </div>
-                  <div>
-                    <p className="text-xs font-bold text-slate-900 dark:text-white">{item.title}</p>
-                    <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{item.desc}</p>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
+            <div className="mt-8 flex items-center gap-3 text-[11px] font-medium text-slate-500 dark:text-slate-400">
+              <span className="flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 bg-white/80 text-emerald-600 dark:border-slate-800 dark:bg-slate-900">
+                <Lock className="h-4 w-4" />
+              </span>
+              Your access is checked for every workspace request.
+            </div>
           </div>
         </div>
 
-        {/* Right Authentication Card */}
-        <Card className="preview-shadow mx-auto w-full max-w-md space-y-6 border-white/80 bg-white/95 p-6 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-900/95 sm:p-8">
-          <div className="space-y-1.5 text-center">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-600/25">
-              <Lock className="h-5 w-5" />
-            </div>
-            <h1 className="pt-1 text-2xl font-bold tracking-tight text-slate-950 dark:text-white">
-              Sign in to SUMIND-IQ
-            </h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Access your organisation’s permission-scoped AI knowledge base
+        <Card className="preview-shadow relative mx-auto w-full max-w-[440px] overflow-hidden border-white/80 bg-white/95 p-6 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-900/95 sm:p-8">
+          <div
+            aria-hidden="true"
+            className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-600 via-indigo-500 to-violet-500"
+          />
+          <div className="space-y-2">
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-700 ring-1 ring-blue-100 dark:bg-blue-950/60 dark:text-blue-300 dark:ring-blue-900">
+              <Lock className="h-[18px] w-[18px]" />
+            </span>
+            <h2 className="pt-1 text-[26px] font-extrabold tracking-[-0.035em] text-slate-950 dark:text-white">
+              Welcome back
+            </h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              Sign in to continue to your knowledge workspace.
             </p>
           </div>
 
           {serverError && (
             <div
               role="alert"
-              className="rounded-xl border border-rose-200 bg-rose-50 p-3.5 text-xs font-medium text-rose-700 dark:border-rose-800 dark:bg-rose-950/40 dark:text-rose-300"
+              className="mt-5 flex items-start gap-2.5 rounded-xl border border-rose-200 bg-rose-50 p-3.5 text-sm font-medium text-rose-700 dark:border-rose-800 dark:bg-rose-950/40 dark:text-rose-300"
             >
-              {serverError}
+              <span className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-rose-500" />
+              <span>{serverError}</span>
             </div>
           )}
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
-            <Input
-              label="Work Email"
-              type="email"
-              placeholder="name@organisation.com"
-              error={errors.email?.message}
-              {...register('email')}
-            />
-            <Input
-              label="Password"
-              type="password"
-              placeholder="••••••••••••"
-              error={errors.password?.message}
-              {...register('password')}
-            />
-
-            <div className="flex items-center justify-between text-xs">
-              <span className="inline-flex items-center gap-1 text-slate-500">
-                <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
-                Argon2id + JWT Secured
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="mt-6 space-y-4"
+            noValidate
+          >
+            <div className="relative">
+              <Mail
+                aria-hidden="true"
+                className="pointer-events-none absolute left-3.5 top-[39px] h-[17px] w-[17px] text-slate-400"
+              />
+              <Input
+                label="Work email"
+                type="email"
+                autoComplete="username"
+                autoCapitalize="none"
+                spellCheck={false}
+                inputMode="email"
+                placeholder="you@organisation.com"
+                error={errors.email?.message}
+                className="h-12 rounded-xl pl-11"
+                {...register('email', {
+                  onChange: () => {
+                    setSelectedDemoRole(null);
+                    setServerError(null);
+                  },
+                })}
+              />
+            </div>
+            <div className="relative">
+              <KeyRound
+                aria-hidden="true"
+                className="pointer-events-none absolute left-3.5 top-[39px] h-[17px] w-[17px] text-slate-400"
+              />
+              <Input
+                label="Password"
+                type={showPassword ? 'text' : 'password'}
+                autoComplete="current-password"
+                placeholder="Enter your password"
+                error={errors.password?.message}
+                className="h-12 rounded-xl pl-11 pr-12"
+                {...register('password', {
+                  onChange: () => {
+                    setSelectedDemoRole(null);
+                    setServerError(null);
+                  },
+                })}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((visible) => !visible)}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                aria-pressed={showPassword}
+                className="absolute right-2.5 top-[33px] inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 dark:hover:bg-slate-800 dark:hover:text-white"
+              >
+                {showPassword ? (
+                  <EyeOff className="h-[17px] w-[17px]" />
+                ) : (
+                  <Eye className="h-[17px] w-[17px]" />
+                )}
+              </button>
+            </div>
+            <div className="flex items-center justify-between gap-3 pt-0.5 text-xs">
+              <span className="inline-flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+                <ShieldCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />{' '}
+                Secure sign-in
               </span>
               <Link
                 to="/forgot-password"
-                className="font-semibold text-blue-600 hover:underline dark:text-blue-400"
+                className="font-semibold text-blue-700 transition hover:text-indigo-700 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
               >
                 Forgot password?
               </Link>
             </div>
-
-            <Button type="submit" variant="primary" className="w-full" isLoading={isSubmitting}>
-              Sign In to Workspace
+            <Button
+              type="submit"
+              variant="primary"
+              size="lg"
+              className="mt-1 w-full shadow-lg shadow-blue-700/20"
+              isLoading={isSubmitting}
+            >
+              Sign in to workspace <ArrowRight className="h-4 w-4" />
             </Button>
           </form>
 
-          {/* Explicitly Labelled Demonstration Accounts */}
-          <div className="space-y-2.5 border-t border-slate-200/80 pt-4 dark:border-slate-800">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                Demonstration Role Accounts [DEMO DATA]
-              </span>
-              <Badge variant="amber">Evaluation</Badge>
+          <div className="mt-6 rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4 dark:border-slate-800 dark:bg-slate-950/50">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-bold text-slate-800 dark:text-slate-100">
+                  Try a demo account
+                </p>
+                <p className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">
+                  Prefills seeded demo credentials
+                </p>
+              </div>
+              <Badge variant="amber" className="shrink-0">
+                Demo data
+              </Badge>
             </div>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400">
-              Click a role below to populate seeded demonstration credentials for testing RBAC:
-            </p>
-            <div className="grid grid-cols-3 gap-2">
-              <button
-                type="button"
-                onClick={() => fillDemoAccount('admin', 'admin@sumind-iq.demo', 'Admin@12345')}
-                className={`flex flex-col items-center rounded-xl border p-2.5 text-xs transition-all ${
-                  selectedDemoRole === 'admin'
-                    ? 'border-blue-600 bg-blue-50/70 ring-2 ring-blue-500/20 dark:bg-blue-950/50'
-                    : 'border-slate-200 hover:border-blue-400 hover:bg-blue-50/40 dark:border-slate-800 dark:hover:bg-blue-950/30'
-                }`}
-              >
-                <ShieldCheck className="mb-1 h-4 w-4 text-blue-600" />
-                <span className="font-semibold">Admin</span>
-                <span className="text-[10px] text-slate-400">Full Scope</span>
-              </button>
-              <button
-                type="button"
-                onClick={() =>
-                  fillDemoAccount('manager', 'manager@sumind-iq.demo', 'Manager@12345')
-                }
-                className={`flex flex-col items-center rounded-xl border p-2.5 text-xs transition-all ${
-                  selectedDemoRole === 'manager'
-                    ? 'border-blue-600 bg-blue-50/70 ring-2 ring-blue-500/20 dark:bg-blue-950/50'
-                    : 'border-slate-200 hover:border-blue-400 hover:bg-blue-50/40 dark:border-slate-800 dark:hover:bg-blue-950/30'
-                }`}
-              >
-                <UserCheck className="mb-1 h-4 w-4 text-emerald-600" />
-                <span className="font-semibold">Manager</span>
-                <span className="text-[10px] text-slate-400">Team Scope</span>
-              </button>
-              <button
-                type="button"
-                onClick={() =>
-                  fillDemoAccount('employee', 'employee@sumind-iq.demo', 'Employee@12345')
-                }
-                className={`flex flex-col items-center rounded-xl border p-2.5 text-xs transition-all ${
-                  selectedDemoRole === 'employee'
-                    ? 'border-blue-600 bg-blue-50/70 ring-2 ring-blue-500/20 dark:bg-blue-950/50'
-                    : 'border-slate-200 hover:border-blue-400 hover:bg-blue-50/40 dark:border-slate-800 dark:hover:bg-blue-950/30'
-                }`}
-              >
-                <Mail className="mb-1 h-4 w-4 text-indigo-600" />
-                <span className="font-semibold">Employee</span>
-                <span className="text-[10px] text-slate-400">Standard</span>
-              </button>
+            <div className="mt-3 grid grid-cols-3 gap-2">
+              {demoAccounts.map((demo) => {
+                const Icon = demo.icon;
+                const selected = selectedDemoRole === demo.role;
+                return (
+                  <button
+                    key={demo.role}
+                    type="button"
+                    onClick={() =>
+                      fillDemoAccount(demo.role, demo.email, demo.password)
+                    }
+                    aria-pressed={selected}
+                    className={`flex min-h-[76px] flex-col items-center justify-center rounded-xl border px-1.5 py-2 text-center transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 ${selected ? 'border-blue-500 bg-white shadow-sm ring-2 ring-blue-500/15 dark:bg-slate-900' : 'border-slate-200 bg-white/70 hover:border-blue-300 hover:bg-white dark:border-slate-700 dark:bg-slate-900/60 dark:hover:border-blue-700'}`}
+                  >
+                    <Icon className={`mb-1 h-4 w-4 ${demo.color}`} />
+                    <span className="text-[11px] font-bold text-slate-800 dark:text-slate-100">
+                      {demo.label}
+                    </span>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400">
+                      {demo.note}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          <p className="text-center text-xs text-slate-500">
+          <p className="mt-5 text-center text-xs text-slate-500 dark:text-slate-400">
             New to SUMIND-IQ?{' '}
-            <Link to="/register" className="font-semibold text-blue-600 hover:underline">
+            <Link
+              to="/register"
+              className="font-bold text-blue-700 hover:underline dark:text-blue-400"
+            >
               Create an account
             </Link>
           </p>
@@ -250,7 +348,6 @@ export function LoginPage() {
     </div>
   );
 }
-
 const registerSchema = z.object({
   full_name: z.string().min(2, 'Full name must be at least 2 characters'),
   email: z.string().email('Enter a valid work email address'),

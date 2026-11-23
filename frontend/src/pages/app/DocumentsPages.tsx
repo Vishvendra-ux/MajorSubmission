@@ -121,7 +121,10 @@ export function DocumentLibraryPage() {
       const res = await apiRequest<{ download_url: string }>(
         `/documents/${doc.id}/signed-download-url`
       );
-      window.open(res.download_url, '_blank', 'noopener,noreferrer');
+      const targetUrl = res.download_url.startsWith('/api/v1')
+        ? `${window.location.port === '5173' ? `http://${window.location.hostname}:8000` : ''}${res.download_url}`
+        : res.download_url;
+      window.open(targetUrl, '_blank', 'noopener,noreferrer');
       toast({
         title: 'Signed Download Started',
         description: `Generated short-lived signed URL for ${doc.original_filename}.`,

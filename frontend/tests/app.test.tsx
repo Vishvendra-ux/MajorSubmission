@@ -49,10 +49,11 @@ describe('SUMIND-IQ Frontend Suite', () => {
 
   it('validates LoginPage fields and displays quick demo role switcher buttons', async () => {
     renderWithProviders(<LoginPage />, ['/login']);
-    expect(screen.getByText(/Sign in to SUMIND-IQ/i)).toBeInTheDocument();
     expect(
-      screen.getByText(/Demonstration Role Accounts \[DEMO DATA\]/i)
+      screen.getByText(/Sign in to continue to your knowledge workspace/i)
     ).toBeInTheDocument();
+    expect(screen.getByText(/Try a demo account/i)).toBeInTheDocument();
+    expect(screen.getByText(/Demo data/i)).toBeInTheDocument();
     expect(screen.getByText('Admin')).toBeInTheDocument();
     expect(screen.getByText('Manager')).toBeInTheDocument();
     expect(screen.getByText('Employee')).toBeInTheDocument();

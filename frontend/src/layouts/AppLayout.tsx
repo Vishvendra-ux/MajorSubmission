@@ -140,20 +140,30 @@ export function AppLayout() {
         <div className="space-y-1">
           {items.map((item) => {
             const Icon = item.icon;
+            const isCurrentPath =
+              location.pathname === item.to || location.pathname.startsWith(`${item.to}/`);
             return (
               <NavLink
                 key={item.to}
                 to={item.to}
                 title={collapsed ? item.label : undefined}
                 className={({ isActive }) =>
-                  `group flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-150 ${
+                  `group flex items-center gap-3 rounded-xl px-2.5 py-2 text-[13px] font-medium transition-all duration-200 ${
                     isActive
-                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-600/20'
+                      ? 'bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-600 text-white shadow-md shadow-blue-700/20'
                       : 'text-slate-600 dark:text-slate-300 hover:bg-blue-50/80 dark:hover:bg-slate-800/80 hover:text-blue-700 dark:hover:text-white'
                   }`
                 }
               >
-                <Icon className="h-4 w-4 shrink-0" />
+                <span
+                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${
+                    isCurrentPath
+                      ? 'bg-white/15 text-white ring-1 ring-white/15'
+                      : 'text-slate-500 group-hover:bg-white group-hover:text-blue-700 dark:text-slate-400 dark:group-hover:bg-slate-700 dark:group-hover:text-blue-300'
+                  }`}
+                >
+                  <Icon className="h-[17px] w-[17px] stroke-[1.8]" />
+                </span>
                 {!collapsed && <span className="truncate">{item.label}</span>}
               </NavLink>
             );
@@ -172,7 +182,7 @@ export function AppLayout() {
           collapsed ? 'w-20' : 'w-64'
         }`}
       >
-        <div className="flex h-[72px] items-center justify-between border-b border-slate-100 px-4 dark:border-slate-800">
+        <div className={`flex h-[72px] items-center justify-between border-b border-slate-100 dark:border-slate-800 ${collapsed ? 'px-2' : 'px-4'}`}>
           <BrandLogo to="/app/dashboard" collapsed={collapsed} />
           <button
             type="button"
@@ -214,11 +224,13 @@ export function AppLayout() {
       {/* Mobile Drawer */}
       {mobileOpen && (
         <div className="fixed inset-0 z-50 flex lg:hidden">
-          <div
+          <button
+            type="button"
+            aria-label="Close navigation menu"
             className="fixed inset-0 bg-slate-950/60"
             onClick={() => setMobileOpen(false)}
           />
-          <aside className="relative z-10 flex w-72 flex-col bg-white dark:bg-slate-900 p-4 shadow-xl overflow-y-auto">
+          <aside role="dialog" aria-modal="true" aria-label="Workspace navigation" className="relative z-10 flex w-72 flex-col bg-white dark:bg-slate-900 p-4 shadow-xl overflow-y-auto">
             <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
               <BrandLogo to="/app/dashboard" />
               <button
@@ -242,7 +254,7 @@ export function AppLayout() {
       {/* Main Content Area */}
       <div className="flex flex-1 flex-col min-w-0">
         {/* Top Navigation Bar */}
-        <header className="sticky top-0 z-30 flex h-[72px] items-center justify-between gap-4 border-b border-slate-200/80 bg-white/90 px-4 shadow-[0_10px_34px_-32px_rgba(15,23,42,0.45)] backdrop-blur-xl dark:border-slate-800 dark:bg-slate-900/90 sm:px-6">
+        <header className="sticky top-0 z-30 flex h-[72px] items-center justify-between gap-3 border-b border-slate-200/80 bg-white/90 px-3.5 shadow-[0_10px_34px_-32px_rgba(15,23,42,0.45)] backdrop-blur-xl dark:border-slate-800 dark:bg-slate-900/90 sm:gap-4 sm:px-6">
           <div className="flex items-center gap-3 min-w-0">
             <button
               type="button"
@@ -253,22 +265,19 @@ export function AppLayout() {
               <Menu className="h-5 w-5" />
             </button>
 
-            <nav aria-label="Breadcrumb" className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 capitalize truncate">
+            <nav aria-label="Breadcrumb" className="hidden min-w-0 items-center gap-1.5 text-[11px] font-medium text-slate-500 dark:text-slate-400 capitalize sm:flex">
               {breadcrumbs.map((crumb, idx) => (
                 <React.Fragment key={idx}>
-                  {idx > 0 && <span>/</span>}
-                  <span
-                    className={
-                      idx === breadcrumbs.length - 1
-                        ? 'font-semibold text-slate-900 dark:text-slate-100'
-                        : ''
-                    }
-                  >
-                    {crumb}
+                  {idx > 0 && <ChevronRight aria-hidden="true" className="h-3 w-3 text-slate-300 dark:text-slate-600" />}
+                  <span className={idx === breadcrumbs.length - 1 ? 'truncate font-bold text-slate-900 dark:text-slate-100' : 'shrink-0'}>
+                    {crumb === 'app' ? 'workspace' : crumb}
                   </span>
                 </React.Fragment>
               ))}
             </nav>
+            <span className="truncate text-sm font-bold capitalize text-slate-900 dark:text-slate-100 sm:hidden">
+              {breadcrumbs[breadcrumbs.length - 1] || 'Workspace'}
+            </span>
           </div>
 
           <div className="flex items-center gap-2.5">
@@ -276,13 +285,14 @@ export function AppLayout() {
             <button
               type="button"
               onClick={() => setCommandOpen(true)}
-              className="flex items-center gap-3 rounded-xl border border-slate-200/90 bg-slate-50/80 px-3.5 py-2 text-xs text-slate-500 shadow-sm transition-all hover:border-blue-300 hover:bg-white dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-400 dark:hover:bg-slate-800"
+              aria-label="Search knowledge base or jump to a page"
+              className="flex h-10 items-center gap-2.5 rounded-xl border border-slate-200/90 bg-slate-50/80 px-3 text-xs text-slate-500 shadow-sm transition-all hover:border-blue-300 hover:bg-white dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-400 dark:hover:bg-slate-800 sm:gap-3 sm:px-3.5"
             >
-              <Search className="h-3.5 w-3.5 text-blue-600" />
-              <span className="hidden md:inline">Search knowledge base or jump...</span>
+              <Search className="h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400" />
+              <span className="hidden md:inline">Search knowledge or jump</span>
               <span className="md:hidden">Search</span>
-              <kbd className="hidden sm:inline-block rounded bg-white dark:bg-slate-900 px-1.5 py-0.5 text-[10px] font-semibold text-slate-500 border border-slate-200 dark:border-slate-700">
-                ⌘K
+              <kbd className="hidden rounded-md border border-slate-200 bg-white px-1.5 py-0.5 text-[10px] font-semibold text-slate-500 dark:border-slate-700 dark:bg-slate-900 sm:inline-block">
+                Ctrl K
               </kbd>
             </button>
 
@@ -290,7 +300,8 @@ export function AppLayout() {
               type="button"
               onClick={toggleTheme}
               aria-label="Toggle theme"
-              className="rounded-xl border border-slate-200/90 bg-white p-2.5 text-slate-600 shadow-sm transition-colors hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
+              title={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+              className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200/90 bg-white p-2.5 text-slate-600 shadow-sm transition-colors hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
             >
               {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
@@ -298,7 +309,8 @@ export function AppLayout() {
             <Link
               to="/app/notifications"
               aria-label="Notifications"
-              className="relative rounded-xl border border-slate-200/90 bg-white p-2.5 text-slate-600 shadow-sm transition-colors hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
+              title="Notifications"
+              className="relative inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200/90 bg-white p-2.5 text-slate-600 shadow-sm transition-colors hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
             >
               <Bell className="h-4 w-4" />
               {unreadCount > 0 && (
@@ -310,14 +322,17 @@ export function AppLayout() {
 
             <Link
               to="/app/profile"
-              className="hidden sm:flex items-center gap-2 rounded-xl border border-slate-200/90 bg-white px-3 py-2 text-xs font-medium text-slate-700 shadow-sm transition-colors hover:border-blue-200 hover:bg-blue-50/70 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+              title="Profile and settings"
+              className="hidden h-10 items-center gap-2 rounded-xl border border-slate-200/90 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 shadow-sm transition-colors hover:border-blue-200 hover:bg-blue-50/70 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 md:flex"
             >
-              <UserIcon className="h-3.5 w-3.5 text-blue-600" />
+              <span aria-hidden="true" className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 text-[10px] font-bold text-white shadow-sm">
+                {user?.full_name.split(/\s+/).map((part) => part[0]).slice(0, 2).join('').toUpperCase() || <UserIcon className="h-3.5 w-3.5" />}
+              </span>
               <span className="max-w-28 truncate">{user?.full_name}</span>
             </Link>
 
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
               onClick={async () => {
                 await logout();
@@ -337,6 +352,10 @@ export function AppLayout() {
             <Outlet />
           </PageSuspense>
         </main>
+        <footer className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-slate-200/70 bg-white/70 px-4 py-3 text-[10px] font-medium text-slate-400 dark:border-slate-800 dark:bg-slate-900/40 dark:text-slate-500 sm:px-6 lg:px-8">
+          <span>SUMIND-IQ <span className="mx-1 text-slate-300 dark:text-slate-700">·</span> Grounded knowledge workspace</span>
+          <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5 text-emerald-600/80 dark:text-emerald-500/80" /> Role-scoped access</span>
+        </footer>
       </div>
 
       {/* Global Command Search Modal */}

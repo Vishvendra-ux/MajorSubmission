@@ -38,7 +38,7 @@ export function LandingPage() {
                 <Sparkles className="h-3.5 w-3.5" />
                 Grounded answers for your team
               </Badge>
-              <h1 className="text-balance text-4xl font-bold leading-[1.08] tracking-[-0.045em] text-slate-950 dark:text-white sm:text-5xl lg:text-[3.65rem]">
+              <h1 className="text-balance text-4xl font-bold leading-[1.08] tracking-[-0.045em] text-slate-950 dark:text-white sm:text-5xl lg:text-5xl">
                 Your organization’s knowledge,{' '}
                 <span className="bg-gradient-to-r from-blue-700 via-indigo-600 to-violet-600 bg-clip-text text-transparent dark:from-blue-300 dark:via-indigo-300 dark:to-violet-300">
                   clear and cited.
@@ -50,13 +50,13 @@ export function LandingPage() {
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link to="/login">
-                  <Button variant="primary" size="lg" className="shadow-lg shadow-blue-700/20">
+                  <Button variant="primary" size="lg">
                     Open your knowledge workspace
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
                 <Link to="/register">
-                  <Button variant="outline" size="lg" className="bg-white/80 dark:bg-slate-900/80">
+                  <Button variant="outline" size="lg">
                     Create an organisation workspace
                   </Button>
                 </Link>
@@ -80,9 +80,9 @@ export function LandingPage() {
             <div className="relative mx-auto w-full max-w-[590px] lg:ml-auto">
               <div
                 aria-hidden="true"
-                className="absolute -inset-5 rounded-[36px] bg-gradient-to-br from-blue-300/35 via-indigo-200/25 to-violet-300/35 blur-2xl dark:from-blue-700/20 dark:via-indigo-800/15 dark:to-violet-700/20"
+                className="absolute -inset-5 rounded-2xl bg-gradient-to-br from-blue-300/35 via-indigo-200/25 to-violet-300/35 blur-2xl dark:from-blue-700/20 dark:via-indigo-800/15 dark:to-violet-700/20"
               />
-              <div className="preview-shadow relative overflow-hidden rounded-[26px] border border-white/80 bg-white/95 ring-1 ring-slate-900/[0.04] backdrop-blur-xl dark:border-slate-700/80 dark:bg-slate-900/95 dark:ring-white/[0.06] sm:rounded-[30px]">
+              <div className="preview-shadow relative overflow-hidden rounded-2xl border border-white/80 bg-white/95 ring-1 ring-slate-900/[0.04] backdrop-blur-xl dark:border-slate-700/80 dark:bg-slate-900/95 dark:ring-white/[0.06]">
                 <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4 dark:border-slate-800 sm:px-6">
                   <div className="flex items-center gap-3">
                     <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-600/20">
@@ -92,7 +92,7 @@ export function LandingPage() {
                       <p className="text-sm font-semibold text-slate-900 dark:text-white">
                         Knowledge assistant
                       </p>
-                      <p className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">
+                      <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
                         Illustrative product preview
                       </p>
                     </div>
@@ -103,7 +103,7 @@ export function LandingPage() {
                 </div>
 
                 <div className="space-y-5 p-5 sm:p-6">
-                  <div className="ml-auto max-w-[90%] rounded-2xl rounded-br-md bg-gradient-to-br from-blue-600 to-indigo-600 px-4 py-3 text-sm leading-6 text-white shadow-sm">
+                  <div className="ml-auto max-w-[90%] rounded-2xl rounded-br-lg bg-gradient-to-br from-blue-600 to-indigo-600 px-4 py-3 text-sm leading-6 text-white shadow-sm">
                     What does our travel policy say about expenses and RPO targets?
                   </div>
 
@@ -117,17 +117,17 @@ export function LandingPage() {
                           Grounded response
                         </span>
                         <span className="h-1 w-1 rounded-full bg-slate-300 dark:bg-slate-600" />
-                        <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                        <span className="text-xs text-slate-500 dark:text-slate-400">
                           2 verified citations
                         </span>
                       </div>
                       <p className="mt-2 text-sm leading-6 text-slate-700 dark:text-slate-200">
                         The policy defines eligible travel expenses and reimbursement approval tiers{' '}
-                        <span className="rounded bg-blue-50 px-1.5 py-0.5 text-xs font-semibold text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+                        <span className="rounded-lg bg-blue-50 px-1.5 py-0.5 text-xs font-semibold text-blue-700 dark:bg-blue-950 dark:text-blue-300">
                           [Source 1]
                         </span>
                         , while Tier-1 disaster recovery mandates a 15-minute RPO{' '}
-                        <span className="rounded bg-blue-50 px-1.5 py-0.5 text-xs font-semibold text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+                        <span className="rounded-lg bg-blue-50 px-1.5 py-0.5 text-xs font-semibold text-blue-700 dark:bg-blue-950 dark:text-blue-300">
                           [Source 2]
                         </span>
                         .
@@ -142,7 +142,7 @@ export function LandingPage() {
                             <p className="truncate text-xs font-semibold text-slate-800 dark:text-slate-100">
                               Travel &amp; Expenses Policy
                             </p>
-                            <p className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">
+                            <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
                               Page 8 · Expense eligibility
                             </p>
                           </div>
@@ -156,7 +156,7 @@ export function LandingPage() {
                             <p className="truncate text-xs font-semibold text-slate-800 dark:text-slate-100">
                               Zero-Trust Security &amp; DR Standard
                             </p>
-                            <p className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">
+                            <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
                               Section 3 · RPO &amp; RTO Targets
                             </p>
                           </div>
@@ -168,11 +168,11 @@ export function LandingPage() {
                 </div>
 
                 <div className="flex items-center justify-between border-t border-slate-100 bg-slate-50/80 px-5 py-3 dark:border-slate-800 dark:bg-slate-950/50 sm:px-6">
-                  <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                  <span className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">
                     <Lock className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
                     Access checked before retrieval
                   </span>
-                  <span className="hidden text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400 sm:inline">
+                  <span className="hidden text-xs font-semibold uppercase tracking-[0.14em] text-slate-400 sm:inline">
                     SUMIND-IQ
                   </span>
                 </div>
@@ -188,7 +188,7 @@ export function LandingPage() {
               {['PDF', 'DOCX', 'PPTX', 'XLSX', 'TXT'].map((format) => (
                 <span
                   key={format}
-                  className="rounded-lg border border-slate-200/80 bg-white/70 px-3 py-1.5 text-[10px] font-bold tracking-[0.12em] text-slate-500 shadow-sm dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-400"
+                  className="rounded-lg border border-slate-200/80 bg-white/70 px-3 py-1.5 text-xs font-bold tracking-[0.12em] text-slate-500 shadow-sm dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-400"
                 >
                   {format}
                 </span>
@@ -323,7 +323,7 @@ export function LandingPage() {
 
       {/* Bottom Call-to-Action Banner */}
       <section className="mx-auto max-w-7xl px-4 pt-20 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-3xl border border-blue-200/80 bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-700 p-8 text-white shadow-xl sm:p-12">
+        <div className="relative overflow-hidden rounded-2xl border border-blue-200/80 bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-700 p-8 text-white shadow-xl sm:p-12">
           <div className="relative z-10 flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
             <div className="max-w-2xl">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur">
